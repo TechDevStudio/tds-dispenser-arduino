@@ -16,12 +16,6 @@ extern void ui_SC02Selection_screen_destroy(void);
 extern lv_obj_t *ui_SC02Selection;
 extern lv_obj_t *ui_SC02Title;
 extern lv_obj_t *ui_ContScrollOption;
-extern lv_obj_t *ui_Panel1;
-extern lv_obj_t *ui_Panel2;
-extern lv_obj_t *ui_Panel3;
-extern lv_obj_t *ui_Panel4;
-extern void ui_event_BtnNextComp1_BtnNextComp( lv_event_t * e);
-extern lv_obj_t *ui_BtnNextComp1;
 // CUSTOM VARIABLES
 
 #ifdef __cplusplus

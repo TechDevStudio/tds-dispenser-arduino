@@ -5,15 +5,8 @@
 
 #include "ui.h"
 
-lv_obj_t *ui_SC02Selection = NULL;lv_obj_t *ui_SC02Title = NULL;lv_obj_t *ui_ContScrollOption = NULL;lv_obj_t *ui_Panel1 = NULL;lv_obj_t *ui_Panel2 = NULL;lv_obj_t *ui_Panel3 = NULL;lv_obj_t *ui_Panel4 = NULL;lv_obj_t *ui_BtnNextComp1 = NULL;
+lv_obj_t *ui_SC02Selection = NULL;lv_obj_t *ui_SC02Title = NULL;lv_obj_t *ui_ContScrollOption = NULL;
 // event funtions
-void ui_event_BtnNextComp1_BtnNextComp( lv_event_t * e) {
-    lv_event_code_t event_code = lv_event_get_code(e);
-
-if ( event_code == LV_EVENT_CLICKED) {
-      _ui_screen_change( &ui_SC03Dispensar, LV_SCR_LOAD_ANIM_NONE, 300, 0, &ui_SC03Dispensar_screen_init);
-}
-}
 
 // build funtions
 
@@ -43,62 +36,15 @@ lv_obj_set_width( ui_ContScrollOption, 794);
 lv_obj_set_height( ui_ContScrollOption, 399);
 lv_obj_set_x( ui_ContScrollOption, 0 );
 lv_obj_set_y( ui_ContScrollOption, 24 );
-lv_obj_set_align( ui_ContScrollOption, LV_ALIGN_CENTER );
+lv_obj_set_align( ui_ContScrollOption, LV_ALIGN_LEFT_MID );
 lv_obj_set_flex_flow(ui_ContScrollOption,LV_FLEX_FLOW_ROW);
-lv_obj_set_flex_align(ui_ContScrollOption, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-lv_obj_add_flag( ui_ContScrollOption, LV_OBJ_FLAG_SCROLL_WITH_ARROW );   /// Flags
-lv_obj_remove_flag( ui_ContScrollOption, LV_OBJ_FLAG_CLICKABLE );    /// Flags
+lv_obj_set_flex_align(ui_ContScrollOption, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+lv_obj_remove_flag( ui_ContScrollOption, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLL_MOMENTUM );    /// Flags
 lv_obj_set_scrollbar_mode(ui_ContScrollOption, LV_SCROLLBAR_MODE_ACTIVE);
 lv_obj_set_scroll_dir(ui_ContScrollOption, LV_DIR_HOR);
 lv_obj_set_scroll_snap_x(ui_ContScrollOption, LV_SCROLL_SNAP_CENTER);
 lv_obj_set_style_pad_row(ui_ContScrollOption, 10, LV_PART_MAIN| LV_STATE_DEFAULT);
 lv_obj_set_style_pad_column(ui_ContScrollOption, 20, LV_PART_MAIN| LV_STATE_DEFAULT);
-
-ui_Panel1 = lv_obj_create(ui_ContScrollOption);
-lv_obj_set_width( ui_Panel1, 400);
-lv_obj_set_height( ui_Panel1, 400);
-lv_obj_set_x( ui_Panel1, 34 );
-lv_obj_set_y( ui_Panel1, -1 );
-lv_obj_set_align( ui_Panel1, LV_ALIGN_CENTER );
-lv_obj_remove_flag( ui_Panel1, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
-lv_obj_set_style_radius(ui_Panel1, 400, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_bg_image_src( ui_Panel1, &ui_img_generic_option_200_png, LV_PART_MAIN | LV_STATE_DEFAULT );
-
-ui_Panel2 = lv_obj_create(ui_ContScrollOption);
-lv_obj_set_width( ui_Panel2, 400);
-lv_obj_set_height( ui_Panel2, 400);
-lv_obj_set_x( ui_Panel2, 34 );
-lv_obj_set_y( ui_Panel2, -1 );
-lv_obj_set_align( ui_Panel2, LV_ALIGN_CENTER );
-lv_obj_remove_flag( ui_Panel2, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
-lv_obj_set_style_radius(ui_Panel2, 400, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_bg_image_src( ui_Panel2, &ui_img_generic_option_200_png, LV_PART_MAIN | LV_STATE_DEFAULT );
-
-ui_Panel3 = lv_obj_create(ui_ContScrollOption);
-lv_obj_set_width( ui_Panel3, 400);
-lv_obj_set_height( ui_Panel3, 400);
-lv_obj_set_x( ui_Panel3, 34 );
-lv_obj_set_y( ui_Panel3, -1 );
-lv_obj_set_align( ui_Panel3, LV_ALIGN_CENTER );
-lv_obj_remove_flag( ui_Panel3, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
-lv_obj_set_style_radius(ui_Panel3, 400, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_bg_image_src( ui_Panel3, &ui_img_generic_option_200_png, LV_PART_MAIN | LV_STATE_DEFAULT );
-
-ui_Panel4 = lv_obj_create(ui_ContScrollOption);
-lv_obj_set_width( ui_Panel4, 400);
-lv_obj_set_height( ui_Panel4, 400);
-lv_obj_set_x( ui_Panel4, 34 );
-lv_obj_set_y( ui_Panel4, -1 );
-lv_obj_set_align( ui_Panel4, LV_ALIGN_CENTER );
-lv_obj_remove_flag( ui_Panel4, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
-lv_obj_set_style_radius(ui_Panel4, 400, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_bg_image_src( ui_Panel4, &ui_img_generic_option_200_png, LV_PART_MAIN | LV_STATE_DEFAULT );
-
-ui_BtnNextComp1 = ui_BtnNextComp_create(ui_SC02Selection);
-lv_obj_set_x( ui_BtnNextComp1, 361 );
-lv_obj_set_y( ui_BtnNextComp1, -212 );
-
-lv_obj_add_event_cb(ui_BtnNextComp1, ui_event_BtnNextComp1_BtnNextComp, LV_EVENT_ALL, NULL);
 
 }
 
@@ -110,10 +56,5 @@ void ui_SC02Selection_screen_destroy(void)
 ui_SC02Selection= NULL;
 ui_SC02Title= NULL;
 ui_ContScrollOption= NULL;
-ui_Panel1= NULL;
-ui_Panel2= NULL;
-ui_Panel3= NULL;
-ui_Panel4= NULL;
-ui_BtnNextComp1= NULL;
 
 }

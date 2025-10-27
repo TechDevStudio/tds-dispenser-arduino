@@ -13,18 +13,13 @@ extern "C" {
 // SCREEN: ui_SC03Dispensar
 extern void ui_SC03Dispensar_screen_init(void);
 extern void ui_SC03Dispensar_screen_destroy(void);
-extern void ui_event_SC03Dispensar( lv_event_t * e);
 extern lv_obj_t *ui_SC03Dispensar;
 extern lv_obj_t *ui_SC03Title;
 extern lv_obj_t *ui_Spinbox1;
-extern void ui_event_BTNDispensar( lv_event_t * e);
-extern lv_obj_t *ui_BTNDispensar;
-extern lv_obj_t *ui_LblPour;
 extern lv_obj_t *ui_BarDispensed;
-extern void ui_event_Button3( lv_event_t * e);
-extern lv_obj_t *ui_Button3;
+extern lv_obj_t *ui_Image1;
+extern lv_obj_t *ui_BtnFinalizr;
 // CUSTOM VARIABLES
-extern lv_obj_t *uic_BTNDispensar;
 
 #ifdef __cplusplus
 } /*extern "C"*/

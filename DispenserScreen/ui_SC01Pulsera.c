@@ -5,24 +5,13 @@
 
 #include "ui.h"
 
-lv_obj_t *ui_SC01Pulsera = NULL;lv_obj_t *ui_TitleScreen01 = NULL;lv_obj_t *ui_Label1 = NULL;lv_obj_t *ui_Label2 = NULL;lv_obj_t *ui_Label3 = NULL;lv_obj_t *ui_Label4 = NULL;lv_obj_t *ui_BrdScan = NULL;lv_obj_t *ui_BrdSelect = NULL;lv_obj_t *ui_BrdPour = NULL;lv_obj_t *ui_BrdEnjoy = NULL;lv_obj_t *ui_BtnNextComp = NULL;
+lv_obj_t *ui_SC01Pulsera = NULL;lv_obj_t *ui_TitleScreen01 = NULL;lv_obj_t *ui_BrdScan = NULL;lv_obj_t *ui_LblErrorMessage = NULL;
 // event funtions
 void ui_event_SC01Pulsera( lv_event_t * e) {
     lv_event_code_t event_code = lv_event_get_code(e);
 
 if ( event_code == LV_EVENT_SCREEN_LOADED) {
-      AnmImgEnjoy_Animation(ui_comp_get_child(ui_BrdEnjoy, UI_COMP_SELECTBASIC_IMGSELECTION), 0);
-      AnmImgPour_Animation(ui_comp_get_child(ui_BrdPour, UI_COMP_SELECTBASIC_IMGSELECTION), 0);
-      AnmImgSelect_Animation(ui_comp_get_child(ui_BrdSelect, UI_COMP_SELECTBASIC_IMGSELECTION), 0);
       AnmImgScan_Animation(ui_comp_get_child(ui_BrdScan, UI_COMP_SELECTBASIC_IMGSELECTION), 0);
-}
-}
-
-void ui_event_BtnNextComp_BtnNextComp( lv_event_t * e) {
-    lv_event_code_t event_code = lv_event_get_code(e);
-
-if ( event_code == LV_EVENT_CLICKED) {
-      _ui_screen_change( &ui_SC02Selection, LV_SCR_LOAD_ANIM_NONE, 300, 0, &ui_SC02Selection_screen_init);
 }
 }
 
@@ -38,87 +27,38 @@ ui_object_set_themeable_style_property(ui_SC01Pulsera, LV_PART_MAIN| LV_STATE_DE
 ui_TitleScreen01 = lv_label_create(ui_SC01Pulsera);
 lv_obj_set_width( ui_TitleScreen01, LV_SIZE_CONTENT);  /// 1
 lv_obj_set_height( ui_TitleScreen01, LV_SIZE_CONTENT);   /// 1
-lv_obj_set_x( ui_TitleScreen01, -19 );
-lv_obj_set_y( ui_TitleScreen01, 201 );
+lv_obj_set_x( ui_TitleScreen01, -35 );
+lv_obj_set_y( ui_TitleScreen01, -162 );
 lv_obj_set_align( ui_TitleScreen01, LV_ALIGN_CENTER );
 lv_obj_set_flex_flow(ui_TitleScreen01,LV_FLEX_FLOW_ROW);
 lv_obj_set_flex_align(ui_TitleScreen01, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
 lv_label_set_text(ui_TitleScreen01,"Escanea tu pulsera para empezar");
 ui_object_set_themeable_style_property(ui_TitleScreen01, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR, _ui_theme_color_ColorTxt);
 ui_object_set_themeable_style_property(ui_TitleScreen01, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA, _ui_theme_alpha_ColorTxt);
-lv_obj_set_style_text_font(ui_TitleScreen01, &lv_font_montserrat_20, LV_PART_MAIN| LV_STATE_DEFAULT);
-
-ui_Label1 = lv_label_create(ui_SC01Pulsera);
-lv_obj_set_width( ui_Label1, LV_SIZE_CONTENT);  /// 1
-lv_obj_set_height( ui_Label1, LV_SIZE_CONTENT);   /// 1
-lv_obj_set_x( ui_Label1, -261 );
-lv_obj_set_y( ui_Label1, -2 );
-lv_obj_set_align( ui_Label1, LV_ALIGN_CENTER );
-lv_label_set_text(ui_Label1,"Paso 1. Escanea");
-ui_object_set_themeable_style_property(ui_Label1, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR, _ui_theme_color_ColorTxt);
-ui_object_set_themeable_style_property(ui_Label1, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA, _ui_theme_alpha_ColorTxt);
-
-ui_Label2 = lv_label_create(ui_SC01Pulsera);
-lv_obj_set_width( ui_Label2, LV_SIZE_CONTENT);  /// 1
-lv_obj_set_height( ui_Label2, LV_SIZE_CONTENT);   /// 1
-lv_obj_set_x( ui_Label2, -96 );
-lv_obj_set_y( ui_Label2, -71 );
-lv_obj_set_align( ui_Label2, LV_ALIGN_CENTER );
-lv_label_set_text(ui_Label2,"Paso 2. Selecciona");
-ui_object_set_themeable_style_property(ui_Label2, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR, _ui_theme_color_ColorTxt);
-ui_object_set_themeable_style_property(ui_Label2, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA, _ui_theme_alpha_ColorTxt);
-
-ui_Label3 = lv_label_create(ui_SC01Pulsera);
-lv_obj_set_width( ui_Label3, LV_SIZE_CONTENT);  /// 1
-lv_obj_set_height( ui_Label3, LV_SIZE_CONTENT);   /// 1
-lv_obj_set_x( ui_Label3, 92 );
-lv_obj_set_y( ui_Label3, 14 );
-lv_obj_set_align( ui_Label3, LV_ALIGN_CENTER );
-lv_label_set_text(ui_Label3,"Paso 3. Dispensa");
-ui_object_set_themeable_style_property(ui_Label3, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR, _ui_theme_color_ColorTxt);
-ui_object_set_themeable_style_property(ui_Label3, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA, _ui_theme_alpha_ColorTxt);
-
-ui_Label4 = lv_label_create(ui_SC01Pulsera);
-lv_obj_set_width( ui_Label4, LV_SIZE_CONTENT);  /// 1
-lv_obj_set_height( ui_Label4, LV_SIZE_CONTENT);   /// 1
-lv_obj_set_x( ui_Label4, 296 );
-lv_obj_set_y( ui_Label4, -81 );
-lv_obj_set_align( ui_Label4, LV_ALIGN_CENTER );
-lv_label_set_text(ui_Label4,"Paso 4. Dsifruta");
-ui_object_set_themeable_style_property(ui_Label4, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR, _ui_theme_color_ColorTxt);
-ui_object_set_themeable_style_property(ui_Label4, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA, _ui_theme_alpha_ColorTxt);
+lv_obj_set_style_text_font(ui_TitleScreen01, &lv_font_montserrat_26, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_BrdScan = ui_SelectBasic_create(ui_SC01Pulsera);
-lv_obj_set_x( ui_BrdScan, -265 );
-lv_obj_set_y( ui_BrdScan, -104 );
+lv_obj_set_x( ui_BrdScan, -40 );
+lv_obj_set_y( ui_BrdScan, 17 );
 
 lv_obj_set_style_bg_image_src( ui_BrdScan, &ui_img_scan_200_png, LV_PART_SCROLLBAR | LV_STATE_DEFAULT );
 
 lv_image_set_src(ui_comp_get_child(ui_BrdScan, UI_COMP_SELECTBASIC_IMGSELECTION), &ui_img_scan_200_png);
+lv_image_set_scale(ui_comp_get_child(ui_BrdScan, UI_COMP_SELECTBASIC_IMGSELECTION),190);
 
-ui_BrdSelect = ui_SelectBasic_create(ui_SC01Pulsera);
-lv_obj_set_x( ui_BrdSelect, -98 );
-lv_obj_set_y( ui_BrdSelect, 32 );
+ui_LblErrorMessage = lv_label_create(ui_SC01Pulsera);
+lv_obj_set_width( ui_LblErrorMessage, LV_SIZE_CONTENT);  /// 1
+lv_obj_set_height( ui_LblErrorMessage, LV_SIZE_CONTENT);   /// 1
+lv_obj_set_x( ui_LblErrorMessage, -41 );
+lv_obj_set_y( ui_LblErrorMessage, 167 );
+lv_obj_set_align( ui_LblErrorMessage, LV_ALIGN_CENTER );
+lv_obj_set_flex_flow(ui_LblErrorMessage,LV_FLEX_FLOW_ROW);
+lv_obj_set_flex_align(ui_LblErrorMessage, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+lv_label_set_text(ui_LblErrorMessage,"");
+lv_obj_set_style_text_color(ui_LblErrorMessage, lv_color_hex(0xCE1111), LV_PART_MAIN | LV_STATE_DEFAULT );
+lv_obj_set_style_text_opa(ui_LblErrorMessage, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_font(ui_LblErrorMessage, &lv_font_montserrat_26, LV_PART_MAIN| LV_STATE_DEFAULT);
 
-lv_image_set_src(ui_comp_get_child(ui_BrdSelect, UI_COMP_SELECTBASIC_IMGSELECTION), &ui_img_selection_200_png);
-
-ui_BrdPour = ui_SelectBasic_create(ui_SC01Pulsera);
-lv_obj_set_x( ui_BrdPour, 88 );
-lv_obj_set_y( ui_BrdPour, -90 );
-
-lv_image_set_src(ui_comp_get_child(ui_BrdPour, UI_COMP_SELECTBASIC_IMGSELECTION), &ui_img_pouring_200_png);
-
-ui_BrdEnjoy = ui_SelectBasic_create(ui_SC01Pulsera);
-lv_obj_set_x( ui_BrdEnjoy, 297 );
-lv_obj_set_y( ui_BrdEnjoy, 22 );
-
-lv_image_set_src(ui_comp_get_child(ui_BrdEnjoy, UI_COMP_SELECTBASIC_IMGSELECTION), &ui_img_enjoy_200_png);
-
-ui_BtnNextComp = ui_BtnNextComp_create(ui_SC01Pulsera);
-lv_obj_set_x( ui_BtnNextComp, 326 );
-lv_obj_set_y( ui_BtnNextComp, 197 );
-
-lv_obj_add_event_cb(ui_BtnNextComp, ui_event_BtnNextComp_BtnNextComp, LV_EVENT_ALL, NULL);
 lv_obj_add_event_cb(ui_SC01Pulsera, ui_event_SC01Pulsera, LV_EVENT_ALL, NULL);
 
 }
@@ -130,14 +70,7 @@ void ui_SC01Pulsera_screen_destroy(void)
 // NULL screen variables
 ui_SC01Pulsera= NULL;
 ui_TitleScreen01= NULL;
-ui_Label1= NULL;
-ui_Label2= NULL;
-ui_Label3= NULL;
-ui_Label4= NULL;
 ui_BrdScan= NULL;
-ui_BrdSelect= NULL;
-ui_BrdPour= NULL;
-ui_BrdEnjoy= NULL;
-ui_BtnNextComp= NULL;
+ui_LblErrorMessage= NULL;
 
 }

@@ -13,7 +13,6 @@ extern "C" {
 // SCREEN: ui_SC04Finalizar
 extern void ui_SC04Finalizar_screen_init(void);
 extern void ui_SC04Finalizar_screen_destroy(void);
-extern void ui_event_SC04Finalizar( lv_event_t * e);
 extern lv_obj_t *ui_SC04Finalizar;
 extern lv_obj_t *ui_Spinner3;
 extern lv_obj_t *ui_Label7;

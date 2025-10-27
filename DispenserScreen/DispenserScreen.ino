@@ -2,10 +2,22 @@
 #include <LovyanGFX.hpp>
 #include <lgfx/v1/platforms/esp32s3/Panel_RGB.hpp>
 #include <lgfx/v1/platforms/esp32s3/Bus_RGB.hpp>
+//#include <HardwareSerial.h>
 
-#define SCREEN_WIDTH  800
-#define SCREEN_HEIGHT 480
-#define TFT_BL_PIN 2
+#include <WiFi.h>
+#include <ArduinoOTA.h>
+
+#include "Config.h"
+#include "Beverage.h"
+#include "UIBuilder.h"
+
+// #define SCREEN_WIDTH  800
+// #define SCREEN_HEIGHT 480
+
+// //pin definition
+// #define TFT_BL_PIN 2
+// #define RX_RFREADER_PIN 38  // Your RX pin
+// #define TX_RFREADER_PIN -1  // Not needed for RDM6300, set to -1
 
 // Define LGFX class FIRST
 class LGFX : public lgfx::LGFX_Device {
@@ -75,20 +87,37 @@ LGFX lcd;
 // Then include ui.h
 #include "ui.h"
 
-// Rest of your code...
-#define DRAW_BUF_SIZE ((SCREEN_WIDTH * SCREEN_HEIGHT / 10) * (sizeof(uint16_t)))
-static uint16_t draw_buf[DRAW_BUF_SIZE];
+// Global instances
+BeverageManager beverageManager;
+UIBuilder uiBuilder(&beverageManager);
+
+// Forward declarations
+void my_disp_flush(lv_display_t *disp, const lv_area_t *area, unsigned char* data);
+void touchscreen_read(lv_indev_t *indev, lv_indev_data_t *data);
+// Screen setup - reduced buffer size for testing
+//#define DRAW_BUF_SIZE (SCREEN_WIDTH * 20 * sizeof(uint16_t))  // 20 lines buffer
+
+static uint16_t draw_buf[DRAW_BUF_SIZE / sizeof(uint16_t)];
 uint32_t lastTick = 0;
 
 void my_disp_flush(lv_display_t *disp, const lv_area_t *area, unsigned char* data) {
+  static bool firstFlush = true;
+  if (firstFlush) {
+    Serial.println("First flush called!");
+    firstFlush = false;
+  }
   uint32_t w = (area->x2 - area->x1 + 1);
   uint32_t h = (area->y2 - area->y1 + 1);
   lv_draw_sw_rgb565_swap(data, w*h);
   lcd.pushImageDMA(area->x1, area->y1, w, h, (uint16_t*) data);
-  lv_disp_flush_ready(disp);
+  lv_display_flush_ready(disp);
 }
 
 void touchscreen_read(lv_indev_t *indev, lv_indev_data_t *data) {
+  // Touch temporarily disabled
+  data->state = LV_INDEV_STATE_RELEASED;
+  return;
+
   if (touch_has_signal()) {
     if (touch_touched()) {
       data->point.x = touch_last_x;
@@ -102,42 +131,219 @@ void touchscreen_read(lv_indev_t *indev, lv_indev_data_t *data) {
   }
 }
 
+// RF Reader Setup
+HardwareSerial rfidSerial(2);
+volatile bool dataAvailable = false;
+String rfidTag = "";
+bool readingTag = false;
+
+void IRAM_ATTR onRFIDData() {
+  dataAvailable = true;
+}
+int screen_status = -1;
+String dispenserId = "";
+
 void setup() {
   Serial.begin(115200);
-  
+  delay(1000); // Wait for serial
+  Serial.println("Starting setup...");
+
   pinMode(TFT_BL_PIN, OUTPUT);
   digitalWrite(TFT_BL_PIN, HIGH);
-  
+  Serial.println("Backlight enabled");
+
   lcd.begin();
-  touch_init();
+  Serial.println("LCD begin done");
+/*
+  // More extensive LCD hardware test
+  Serial.println("Testing LCD with color patterns...");
+
+  // Test 1: Fill with RED
+  lcd.fillScreen(TFT_RED);
+  Serial.println("Screen should be RED");
+  delay(1000);
+
+  // Test 2: Fill with GREEN
+  lcd.fillScreen(TFT_GREEN);
+  Serial.println("Screen should be GREEN");
+  delay(1000);
+
+  // Test 3: Fill with BLUE
+  lcd.fillScreen(TFT_BLUE);
+  Serial.println("Screen should be BLUE");
+  delay(1000);
+
+  // Test 4: Fill with WHITE
+  lcd.fillScreen(TFT_WHITE);
+  Serial.println("Screen should be WHITE");
+  delay(1000);
+*/
+  // Test 5: Draw some rectangles
+  lcd.fillScreen(TFT_BLACK);
+  lcd.fillRect(100, 100, 200, 100, TFT_YELLOW);
+  lcd.fillRect(400, 200, 200, 100, TFT_CYAN);
+  Serial.println("Screen should show yellow and cyan rectangles on black");
+  delay(2000);
+
+  lcd.fillScreen(TFT_BLACK);
+  Serial.println("LCD hardware test completed - screen now black");
+
+  // Temporarily disable touch to avoid GPIO errors
+  // touch_init();
+  Serial.println("Touch temporarily disabled");
 
   // Initialize LVGL and UI
   lv_init();
+  Serial.println("LVGL initialized");
+
   lv_display_t * disp = lv_display_create(SCREEN_WIDTH, SCREEN_HEIGHT);
   lv_display_set_buffers(disp, draw_buf, NULL, DRAW_BUF_SIZE, LV_DISPLAY_RENDER_MODE_PARTIAL);
   lv_display_set_flush_cb(disp, my_disp_flush);
-  
+  Serial.println("Display created");
+
   lv_indev_t * indev = lv_indev_create();
   lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
   lv_indev_set_read_cb(indev, touchscreen_read);
-  
-  ui_init();
-  delay(100);
+  Serial.println("Touch input device created");
 
-  // Add click handler to Next button
-  lv_obj_add_event_cb(ui_BtnNextComp, btn_next_clicked, LV_EVENT_CLICKED, NULL);
+   ui_init();
+   Serial.println("UI initialized - should show SC01Pulsera screen");
+
+  // Initialize RFID serial on pin 38 (RX only)
+  rfidSerial.begin(9600, SERIAL_8N1, RX_RFREADER_PIN, TX_RFREADER_PIN);
+  // Attach interrupt to UART RX
+  rfidSerial.onReceive(onRFIDData);
+  Serial.println("RDM6300 RFID Reader initialized on pin 38");
+
+  uint64_t chip_id = ESP.getEfuseMac();
+  char id[32];
+  sprintf(id, "%04X%08X",(uint16_t)(chip_id >> 32), (uint32_t) chip_id);
+  dispenserId = id;
+  Serial.println(String("Dispenser ID: ") + id);
+  delay(1000);
+  
+  screen_status = 0;
   
 }
 
 void loop() {
+  static unsigned long lastScreenChange = 0;
+  static unsigned long stateTimer = 0;
+  static int previousScreenStatus = -1;
+
   lv_tick_inc(millis() - lastTick);
   lastTick = millis();
   lv_timer_handler();
+
+  // Check if screen status changed
+  if (screen_status != previousScreenStatus) {
+    lastScreenChange = millis();
+    stateTimer = millis();
+    previousScreenStatus = screen_status;
+  }
+
+  switch (screen_status){
+    case 0:
+      // Show dispenser ID for 5 seconds
+      if (screen_status != previousScreenStatus) {
+        lv_label_set_text(ui_LabelId, dispenserId.c_str());
+      }
+      if (millis() - stateTimer > 5000) {
+        screen_status = 1;
+      }
+      break;
+
+    case 1:
+      // Show scan screen and wait for RFID
+      if (screen_status != previousScreenStatus) {
+        lv_scr_load_anim(ui_SC01Pulsera, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, false);
+      }
+      if (dataAvailable){
+        processRFIDReading();
+      }
+      break;
+
+    case 2:
+      // Show selection screen
+      if (screen_status != previousScreenStatus) {
+        lv_scr_load_anim(ui_SC02Selection, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, false);
+        stateTimer = millis();
+      }
+      // Optional: auto-advance after delay
+      // if (millis() - stateTimer > 500) {
+      //   screen_status = 3;
+      // }
+      break;
+
+    case 3:
+      screen_status = 4;
+      break;
+
+    case 4:
+      // Clean dispenser for 5 seconds
+      if (screen_status != previousScreenStatus) {
+        Serial.println("CLEANDISPENSER");
+        stateTimer = millis();
+      }
+      if (millis() - stateTimer > 5000) {
+        screen_status = 1;
+      }
+      break;
+
+    default:
+      break;
+  }
+
   delay(5);
 }
 
-// Handler function - goes to selection screen
-void btn_next_clicked(lv_event_t * e) {
-  Serial.println("Next button clicked - going to selection screen");
-  //lv_scr_load_anim(ui_SC03Dispensar, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, false);
+void processRFIDReading() {
+  dataAvailable = false;
+  while (rfidSerial.available()) {
+    char c = rfidSerial.read();
+
+    if (c == 0x02) {  // Start byte
+      rfidTag = "";
+      readingTag = true;
+    }
+    else if (c == 0x03) {  // End byte
+      if (readingTag && rfidTag.length() == 10) {
+        Serial.print("RFID Tag: ");
+        Serial.println(rfidTag);
+        // Convert hex string to decimal (last 8 digits typically)
+      String hexString = String(rfidTag);
+      unsigned long cardID = strtoul(hexString.substring(2).c_str(), NULL, 16);
+      
+      // Format to 10 digits with leading zeros
+      char cardIDStr[11];
+      sprintf(cardIDStr, "%010lu", cardID);
+      
+      Serial.print("Card ID: ");
+      Serial.println(cardIDStr);
+        handleRFIDTag(cardIDStr);
+      }
+      readingTag = false;
+    }
+    else if (readingTag && rfidTag.length() < 10) {
+      rfidTag += c;
+    }
+  }
+}
+
+void handleRFIDTag(String tagID) {
+  // Send to your backend API
+  // Trigger solenoid valve
+  // Update display, etc.
+
+  Serial.print("Processing tag: ");
+  Serial.println(tagID);
+  if (tagID == "0003540239"){
+    screen_status = 2;
+  }else{
+    char errMessage[50];
+    sprintf(errMessage,"Pulsera %s no esta activa", tagID.c_str() );
+    lv_label_set_text(ui_LblErrorMessage, errMessage);
+  }
+
+  
 }

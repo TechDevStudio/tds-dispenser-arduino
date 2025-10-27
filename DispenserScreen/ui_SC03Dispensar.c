@@ -5,33 +5,8 @@
 
 #include "ui.h"
 
-lv_obj_t *uic_BTNDispensar;
-lv_obj_t *ui_SC03Dispensar = NULL;lv_obj_t *ui_SC03Title = NULL;lv_obj_t *ui_Spinbox1 = NULL;lv_obj_t *ui_BTNDispensar = NULL;lv_obj_t *ui_LblPour = NULL;lv_obj_t *ui_BarDispensed = NULL;lv_obj_t *ui_Button3 = NULL;
+lv_obj_t *ui_SC03Dispensar = NULL;lv_obj_t *ui_SC03Title = NULL;lv_obj_t *ui_Spinbox1 = NULL;lv_obj_t *ui_BarDispensed = NULL;lv_obj_t *ui_Image1 = NULL;lv_obj_t *ui_BtnFinalizr = NULL;
 // event funtions
-void ui_event_SC03Dispensar( lv_event_t * e) {
-    lv_event_code_t event_code = lv_event_get_code(e);
-
-if ( event_code == LV_EVENT_LONG_PRESSED) {
-      _ui_screen_change( &ui_SC04Finalizar, LV_SCR_LOAD_ANIM_NONE, 500, 0, &ui_SC04Finalizar_screen_init);
-}
-}
-
-void ui_event_BTNDispensar( lv_event_t * e) {
-    lv_event_code_t event_code = lv_event_get_code(e);
-
-if ( event_code == LV_EVENT_LONG_PRESSED_REPEAT) {
-      _ui_spinbox_step( ui_Spinbox1, 1);
-      _ui_bar_increment( ui_BarDispensed, 10, LV_ANIM_ON);
-}
-}
-
-void ui_event_Button3( lv_event_t * e) {
-    lv_event_code_t event_code = lv_event_get_code(e);
-
-if ( event_code == LV_EVENT_CLICKED) {
-      _ui_screen_change( &ui_SC02Selection, LV_SCR_LOAD_ANIM_NONE, 200, 0, &ui_SC02Selection_screen_init);
-}
-}
 
 // build funtions
 
@@ -45,54 +20,36 @@ ui_object_set_themeable_style_property(ui_SC03Dispensar, LV_PART_MAIN| LV_STATE_
 ui_SC03Title = lv_label_create(ui_SC03Dispensar);
 lv_obj_set_width( ui_SC03Title, LV_SIZE_CONTENT);  /// 1
 lv_obj_set_height( ui_SC03Title, LV_SIZE_CONTENT);   /// 1
-lv_obj_set_x( ui_SC03Title, -121 );
-lv_obj_set_y( ui_SC03Title, -193 );
+lv_obj_set_x( ui_SC03Title, 65 );
+lv_obj_set_y( ui_SC03Title, -187 );
 lv_obj_set_align( ui_SC03Title, LV_ALIGN_CENTER );
 lv_obj_set_flex_flow(ui_SC03Title,LV_FLEX_FLOW_ROW);
 lv_obj_set_flex_align(ui_SC03Title, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
-lv_label_set_text(ui_SC03Title,"Presiona para Dispensar");
+lv_label_set_text(ui_SC03Title,"Dispensa usando la llave");
 ui_object_set_themeable_style_property(ui_SC03Title, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR, _ui_theme_color_ColorTxt);
 ui_object_set_themeable_style_property(ui_SC03Title, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA, _ui_theme_alpha_ColorTxt);
 lv_obj_set_style_text_font(ui_SC03Title, &lv_font_montserrat_20, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_Spinbox1 = lv_spinbox_create(ui_SC03Dispensar);
-lv_obj_set_width( ui_Spinbox1, 70);
-lv_obj_set_height( ui_Spinbox1, 42);
-lv_obj_set_x( ui_Spinbox1, -99 );
-lv_obj_set_y( ui_Spinbox1, -68 );
+lv_obj_set_width( ui_Spinbox1, 261);
+lv_obj_set_height( ui_Spinbox1, 74);
+lv_obj_set_x( ui_Spinbox1, 154 );
+lv_obj_set_y( ui_Spinbox1, 104 );
 lv_obj_set_align( ui_Spinbox1, LV_ALIGN_CENTER );
-lv_obj_remove_flag( ui_Spinbox1, LV_OBJ_FLAG_CLICK_FOCUSABLE );    /// Flags
-lv_spinbox_set_digit_format( ui_Spinbox1, 3, 0);
-lv_spinbox_set_range( ui_Spinbox1, 0,500 );
+lv_obj_set_flex_flow(ui_Spinbox1,LV_FLEX_FLOW_ROW);
+lv_obj_set_flex_align(ui_Spinbox1, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+lv_obj_remove_flag( ui_Spinbox1, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_CLICK_FOCUSABLE );    /// Flags
+lv_spinbox_set_digit_format( ui_Spinbox1, 4, 0);
+lv_spinbox_set_range( ui_Spinbox1, 0,3000 );
 lv_spinbox_set_cursor_pos(ui_Spinbox1, 1 - 1);
-
-ui_BTNDispensar = lv_button_create(ui_SC03Dispensar);
-lv_obj_set_width( ui_BTNDispensar, 200);
-lv_obj_set_height( ui_BTNDispensar, 128);
-lv_obj_set_x( ui_BTNDispensar, -94 );
-lv_obj_set_y( ui_BTNDispensar, 58 );
-lv_obj_set_align( ui_BTNDispensar, LV_ALIGN_CENTER );
-lv_obj_add_flag( ui_BTNDispensar, LV_OBJ_FLAG_SCROLL_ON_FOCUS );   /// Flags
-lv_obj_remove_flag( ui_BTNDispensar, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
-ui_object_set_themeable_style_property(ui_BTNDispensar, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_BG_COLOR, _ui_theme_color_ColorBtn);
-ui_object_set_themeable_style_property(ui_BTNDispensar, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_BG_OPA, _ui_theme_alpha_ColorBtn);
-
-ui_LblPour = lv_label_create(ui_BTNDispensar);
-lv_obj_set_width( ui_LblPour, LV_SIZE_CONTENT);  /// 1
-lv_obj_set_height( ui_LblPour, LV_SIZE_CONTENT);   /// 1
-lv_obj_set_align( ui_LblPour, LV_ALIGN_CENTER );
-lv_label_set_text(ui_LblPour,"DISPENSAR");
-lv_obj_set_style_text_align(ui_LblPour, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_text_font(ui_LblPour, &lv_font_montserrat_18, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_font(ui_Spinbox1, &lv_font_montserrat_48, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_BarDispensed = lv_bar_create(ui_SC03Dispensar);
-lv_bar_set_range(ui_BarDispensed, 0,500);
-lv_bar_set_value(ui_BarDispensed,100,LV_ANIM_OFF);
-lv_bar_set_start_value(ui_BarDispensed, 0, LV_ANIM_OFF);
+lv_bar_set_range(ui_BarDispensed, 0,3000);
 lv_obj_set_width( ui_BarDispensed, 400);
-lv_obj_set_height( ui_BarDispensed, 80);
-lv_obj_set_x( ui_BarDispensed, 233 );
-lv_obj_set_y( ui_BarDispensed, -13 );
+lv_obj_set_height( ui_BarDispensed, 100);
+lv_obj_set_x( ui_BarDispensed, -157 );
+lv_obj_set_y( ui_BarDispensed, 17 );
 lv_obj_set_align( ui_BarDispensed, LV_ALIGN_CENTER );
 lv_obj_set_scrollbar_mode(ui_BarDispensed, LV_SCROLLBAR_MODE_OFF);
 lv_obj_set_scroll_dir(ui_BarDispensed, LV_DIR_VER);
@@ -109,26 +66,31 @@ ui_object_set_themeable_style_property(ui_BarDispensed, LV_PART_INDICATOR| LV_ST
 
 //Compensating for LVGL9.1 draw crash with bar/slider max value when top-padding is nonzero and right-padding is 0
 if (lv_obj_get_style_pad_top(ui_BarDispensed,LV_PART_MAIN) > 0) lv_obj_set_style_pad_right( ui_BarDispensed, lv_obj_get_style_pad_right(ui_BarDispensed,LV_PART_MAIN) + 1, LV_PART_MAIN );
-ui_Button3 = lv_button_create(ui_SC03Dispensar);
-lv_obj_set_width( ui_Button3, 57);
-lv_obj_set_height( ui_Button3, 50);
-lv_obj_set_x( ui_Button3, -360 );
-lv_obj_set_y( ui_Button3, 205 );
-lv_obj_set_align( ui_Button3, LV_ALIGN_CENTER );
-lv_obj_add_flag( ui_Button3, LV_OBJ_FLAG_SCROLL_ON_FOCUS );   /// Flags
-lv_obj_remove_flag( ui_Button3, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
-ui_object_set_themeable_style_property(ui_Button3, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_BG_COLOR, _ui_theme_color_ColorBgr);
-ui_object_set_themeable_style_property(ui_Button3, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_BG_OPA, _ui_theme_alpha_ColorBgr);
-lv_obj_set_style_bg_image_src( ui_Button3, &ui_img_back_arrow_png, LV_PART_MAIN | LV_STATE_DEFAULT );
-lv_obj_set_style_shadow_color(ui_Button3, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT );
-lv_obj_set_style_shadow_opa(ui_Button3, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_shadow_width(ui_Button3, 5, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_shadow_spread(ui_Button3, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
+ui_Image1 = lv_image_create(ui_SC03Dispensar);
+lv_image_set_src(ui_Image1, &ui_img_pouring_200_png);
+lv_obj_set_width( ui_Image1, 130);
+lv_obj_set_height( ui_Image1, 130);
+lv_obj_set_x( ui_Image1, 152 );
+lv_obj_set_y( ui_Image1, -47 );
+lv_obj_set_align( ui_Image1, LV_ALIGN_CENTER );
+lv_obj_set_flex_flow(ui_Image1,LV_FLEX_FLOW_ROW);
+lv_obj_set_flex_align(ui_Image1, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+lv_obj_add_flag( ui_Image1, LV_OBJ_FLAG_CLICKABLE );   /// Flags
+lv_obj_remove_flag( ui_Image1, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+lv_image_set_rotation(ui_Image1,50);
+lv_image_set_scale(ui_Image1,130);
+lv_obj_set_style_radius(ui_Image1, 50, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_bg_color(ui_Image1, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT );
+lv_obj_set_style_bg_opa(ui_Image1, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
 
-lv_obj_add_event_cb(ui_BTNDispensar, ui_event_BTNDispensar, LV_EVENT_ALL, NULL);
-lv_obj_add_event_cb(ui_Button3, ui_event_Button3, LV_EVENT_ALL, NULL);
-lv_obj_add_event_cb(ui_SC03Dispensar, ui_event_SC03Dispensar, LV_EVENT_ALL, NULL);
-uic_BTNDispensar = ui_BTNDispensar;
+ui_BtnFinalizr = ui_BtnNextComp_create(ui_SC03Dispensar);
+lv_obj_set_width( ui_BtnFinalizr, 120);
+lv_obj_set_height( ui_BtnFinalizr, 40);
+lv_obj_set_x( ui_BtnFinalizr, 174 );
+lv_obj_set_y( ui_BtnFinalizr, 195 );
+lv_obj_set_style_text_font(ui_BtnFinalizr, &lv_font_montserrat_20, LV_PART_MAIN| LV_STATE_DEFAULT);
+
+lv_label_set_text(ui_comp_get_child(ui_BtnFinalizr, UI_COMP_BTNNEXTCOMP_LABEL5),"Finalizar");
 
 }
 
@@ -140,10 +102,8 @@ void ui_SC03Dispensar_screen_destroy(void)
 ui_SC03Dispensar= NULL;
 ui_SC03Title= NULL;
 ui_Spinbox1= NULL;
-uic_BTNDispensar= NULL;
-ui_BTNDispensar= NULL;
-ui_LblPour= NULL;
 ui_BarDispensed= NULL;
-ui_Button3= NULL;
+ui_Image1= NULL;
+ui_BtnFinalizr= NULL;
 
 }

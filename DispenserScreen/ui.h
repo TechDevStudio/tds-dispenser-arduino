@@ -30,6 +30,7 @@ extern "C" {
 #include "ui_themes.h"
 
 ///////////////////// SCREENS ////////////////////
+#include "ui_SC00Registrar.h"
 #include "ui_SC01Pulsera.h"
 #include "ui_SC02Selection.h"
 #include "ui_SC03Dispensar.h"
@@ -37,20 +38,13 @@ extern "C" {
 
 ///////////////////// VARIABLES ////////////////////
 extern lv_anim_t * AnmImgScan_Animation( lv_obj_t *TargetObject, int delay);
-extern lv_anim_t * AnmImgSelect_Animation( lv_obj_t *TargetObject, int delay);
-extern lv_anim_t * AnmImgPour_Animation( lv_obj_t *TargetObject, int delay);
-extern lv_anim_t * AnmImgEnjoy_Animation( lv_obj_t *TargetObject, int delay);
 
 // EVENTS
 extern lv_obj_t *ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
 LV_IMG_DECLARE( ui_img_scan_200_png);   // assets/scan_200.png
-LV_IMG_DECLARE( ui_img_selection_200_png);   // assets/selection_200.png
 LV_IMG_DECLARE( ui_img_pouring_200_png);   // assets/pouring_200.png
-LV_IMG_DECLARE( ui_img_enjoy_200_png);   // assets/enjoy_200.png
-LV_IMG_DECLARE( ui_img_generic_option_200_png);   // assets/generic_option_200.png
-LV_IMG_DECLARE( ui_img_back_arrow_png);   // assets/back_arrow.png
 
 // UI INIT
 void ui_init(void);

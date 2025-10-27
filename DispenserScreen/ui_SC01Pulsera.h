@@ -16,16 +16,8 @@ extern void ui_SC01Pulsera_screen_destroy(void);
 extern void ui_event_SC01Pulsera( lv_event_t * e);
 extern lv_obj_t *ui_SC01Pulsera;
 extern lv_obj_t *ui_TitleScreen01;
-extern lv_obj_t *ui_Label1;
-extern lv_obj_t *ui_Label2;
-extern lv_obj_t *ui_Label3;
-extern lv_obj_t *ui_Label4;
 extern lv_obj_t *ui_BrdScan;
-extern lv_obj_t *ui_BrdSelect;
-extern lv_obj_t *ui_BrdPour;
-extern lv_obj_t *ui_BrdEnjoy;
-extern void ui_event_BtnNextComp_BtnNextComp( lv_event_t * e);
-extern lv_obj_t *ui_BtnNextComp;
+extern lv_obj_t *ui_LblErrorMessage;
 // CUSTOM VARIABLES
 
 #ifdef __cplusplus

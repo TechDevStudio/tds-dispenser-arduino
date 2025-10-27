@@ -7,13 +7,6 @@
 
 lv_obj_t *ui_SC04Finalizar = NULL;lv_obj_t *ui_Spinner3 = NULL;lv_obj_t *ui_Label7 = NULL;lv_obj_t *ui_Label6 = NULL;
 // event funtions
-void ui_event_SC04Finalizar( lv_event_t * e) {
-    lv_event_code_t event_code = lv_event_get_code(e);
-
-if ( event_code == LV_EVENT_LONG_PRESSED) {
-      _ui_screen_change( &ui_SC01Pulsera, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 1000, 0, &ui_SC01Pulsera_screen_init);
-}
-}
 
 // build funtions
 
@@ -61,8 +54,6 @@ lv_label_set_text(ui_Label6,"Disfruta tu bebida");
 ui_object_set_themeable_style_property(ui_Label6, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR, _ui_theme_color_ColorTxt);
 ui_object_set_themeable_style_property(ui_Label6, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA, _ui_theme_alpha_ColorTxt);
 lv_obj_set_style_text_font(ui_Label6, &lv_font_montserrat_20, LV_PART_MAIN| LV_STATE_DEFAULT);
-
-lv_obj_add_event_cb(ui_SC04Finalizar, ui_event_SC04Finalizar, LV_EVENT_ALL, NULL);
 
 }
 

@@ -1,6 +1,7 @@
 SET(SOURCES ui_comp_btnnextcomp.c
     ui_comp_selectbasic.c
     ui_comp.c
+    ui_SC00Registrar.c
     ui_SC01Pulsera.c
     ui_SC02Selection.c
     ui_SC03Dispensar.c
@@ -11,10 +12,6 @@ SET(SOURCES ui_comp_btnnextcomp.c
     ui_comp_hook.c
     ui_helpers.c
     ui_img_scan_200_png.c
-    ui_img_selection_200_png.c
-    ui_img_pouring_200_png.c
-    ui_img_enjoy_200_png.c
-    ui_img_generic_option_200_png.c
-    ui_img_back_arrow_png.c)
+    ui_img_pouring_200_png.c)
 
 add_library(ui ${SOURCES})
