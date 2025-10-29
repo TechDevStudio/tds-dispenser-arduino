@@ -18,23 +18,193 @@
 #define COMM_RX_02 16
 #define COMM_TX_02 17
 
-const int noInteractionTime = 3000; //segundos de inactividad para terminar proceso
-const int waterTime = 2000;
-const int airTime = 2000;
+//constantes de tiempo
+#define TIMEOUT_NO_FLOW 5000 //segundos de inactividad para terminar proceso
+#define WATER_TIME 2000 //tiempo de agua en limpieza
+#define AIR_TIME 2000 //tiempo de aire en limpieza
+#define SAFE_DELAY_INTER_PROCESS 200 //tiiempo de espera entre activaciones y desactivaciones
+#define UPDATE_READ_INTERVAL 200 //milisegundos para lectura
 
-volatile int pulseCount = 0;
-float flowRate = 0.0;
-float totalVolume = 0.0;
+//constantes de flujo
+#define SAFE_LOWFLOW_THRESHOLD 0.1 //bajo esto asumimos no hay dispensado
+#define CALIBRATION_FACTOR 7.5
 
+#define DEBUG true
 
+//flujo del proceso
+enum FlowState{
+  WAITING_COMMAND,
+  DISPENSE_START,
+  DISPENSING,
+  DISPENSE_END,
+  CLEAN_CYCLE_START,
+  WATER_CLEAN,
+  AIR_CLEAN,
+  CLEAN_CYCLE_END
+};
+
+FlowState current_state = WAITING_COMMAND;
+
+volatile unsigned long totalPulses = 0;
+volatile unsigned long lastPulseTime = 0;
+
+unsigned long lastUpdateTime = 0;
+unsigned long lastPulseSnapshot = 0;
+unsigned long currentMillis = 0;
 
 void IRAM_ATTR flowSensorISR() {
-  pulseCount++;
+  totalPulses++;
+  lastPulseTime = millis();
 }
 
-void FnCleanCycle(){
-  //guitar interrupst y cerrar todas las valvulas
-  noInterrupts();
+void FnPrintSerial(String message, bool new_line){
+  if(new_line){
+    Serial.println(message);
+  }else{
+    Serial.print(message);
+  }
+}
+
+void FnStartDispensing(int valve_id){
+  current_state = DISPENSE_START;
+
+  //cerramos todo por seguridad
+  FnCloseAllValves();
+
+  //abrimos primero valvula de producto
+  if (valve_id == 1){
+    digitalWrite(VALVE_01,LOW); 
+  }else if(valve_id == 2){
+    digitalWrite(VALVE_02,LOW); 
+  }else if(valve_id == 3){
+    digitalWrite(VALVE_03,LOW); 
+  }else if(valve_id == 4){
+    digitalWrite(VALVE_04,LOW); 
+  }else if(valve_id == 5){
+    digitalWrite(VALVE_05,LOW); 
+  }else if(valve_id == 6){
+    digitalWrite(VALVE_06,LOW); 
+  }else if(valve_id == 7){
+    digitalWrite(VALVE_07,LOW); 
+  }else if(valve_id == 8){
+    digitalWrite(VALVE_08,LOW); 
+  }
+  delay(100);
+
+  FnResetVariables();
+
+  //abrimos valvula de salida
+  pinMode(VALVE_SECOUT,OUTPUT);
+  delay(100);
+
+  //confirmacion de apertura
+  Serial.println("CM_DISP_ON");
+  
+}
+
+void FnReadFlowSensor(){
+  unsigned long currentTime = millis();
+    
+  // Periodic updates for display/monitoring
+  if (currentTime - lastUpdateTime >= UPDATE_READ_INTERVAL) {
+    noInterrupts();
+    unsigned long pulses = totalPulses;
+    interrupts();
+    
+    // Calculate metrics
+    float totalVolume = (pulses / CALIBRATION_FACTOR) * 1000.0; // mL
+    
+    // Calculate current flow rate
+    unsigned long pulsesSinceLastUpdate = pulses - lastPulseSnapshot;
+    unsigned long timeDelta = currentTime - lastUpdateTime;
+    float flowRate = (pulsesSinceLastUpdate / CALIBRATION_FACTOR) * (60000.0 / timeDelta); // L/min
+    
+    FnPrintSerial("Volume: ",false);
+    FnPrintSerial(String(totalVolume,0),false);
+    FnPrintSerial(" mL | Flow: ",false);
+    FnPrintSerial(String(flowRate,2),false);
+    FnPrintSerial(" L/min",true);
+    
+    lastPulseSnapshot = pulses;
+    lastUpdateTime = currentTime;
+  }
+  
+  // Check for flow timeout
+  if (currentTime - lastPulseTime > TIMEOUT_NO_FLOW) {
+    current_state = DISPENSE_END;
+  }
+}
+
+void FnFinishDispensing(){
+  FnCloseAllValves();
+  current_state = CLEAN_CYCLE_START;
+}
+
+
+
+void FnStartCleanCycle(){
+  FnPrintSerial("CLEAN_STARTED",true);
+
+  //noInterrupts();
+
+  //abrir valvula de exhaust
+  digitalWrite(VALVE_EXHAUST,LOW); 
+  
+  current_state = WATER_CLEAN;
+  currentMillis = millis();
+}
+
+void FnWaterCleanCycle(){
+  //abrir agua
+  digitalWrite(VALVE_WATER,LOW);
+  //FnPrintSerial(String(currentMillis),false);
+  //FnPrintSerial("FnWaterCleanCycle",false);
+  //FnPrintSerial(String(millis()),true);
+
+  if(millis() > currentMillis + WATER_TIME){
+    //cerrar agua
+    digitalWrite(VALVE_WATER,HIGH);
+    current_state = AIR_CLEAN;
+    currentMillis = millis();
+  }
+}
+
+void FnAirCleanCycle(){
+  //abrir aire
+  digitalWrite(VALVE_AIR,LOW);
+  //FnPrintSerial(String(currentMillis),false);
+  //FnPrintSerial("FnAirCleanCycle",false);
+  //FnPrintSerial(String(millis()),true);
+  if(millis() > currentMillis + AIR_TIME){
+    //cerrar aire
+    digitalWrite(VALVE_AIR,HIGH);
+    current_state = CLEAN_CYCLE_END;
+    currentMillis = millis();
+  }
+}
+
+void FnEndCleanCycle(){
+  //cerrar exhaust
+  digitalWrite(VALVE_EXHAUST,HIGH); 
+  //FnPrintSerial("CLEAN_FINISHED",true);
+  if(millis() > currentMillis + SAFE_DELAY_INTER_PROCESS){
+    //interrupts();
+    FnPrintSerial("CM_READY",true);
+    current_state = WAITING_COMMAND;
+    currentMillis = millis();
+  }
+}
+
+
+
+void FnResetVariables(){
+  totalPulses = 0;
+  lastPulseSnapshot = 0;
+  lastPulseTime = millis();
+  lastUpdateTime = millis();
+}
+
+void FnCloseAllValves(){
   digitalWrite(VALVE_01,HIGH);  
   digitalWrite(VALVE_02,HIGH);
   digitalWrite(VALVE_03,HIGH);  
@@ -51,31 +221,44 @@ void FnCleanCycle(){
   digitalWrite(VALVE_SECOUT,HIGH);
 
   delay(300);
-  
-  //abrir valvula de exhaust
-  digitalWrite(VALVE_EXHAUST,LOW); 
-  delay(100);
-  //abrir agua
-  digitalWrite(VALVE_WATER,LOW);
-  delay(waterTime);
-  //cerrar agua
-  digitalWrite(VALVE_WATER,HIGH);
-  delay(100);
-  
-  //abrir aire
-  digitalWrite(VALVE_AIR,LOW);
-  delay(airTime);
-  //cerrar aire
-  digitalWrite(VALVE_AIR,HIGH);
-  delay(100);
-
-  //cerrar exhaust
-  digitalWrite(VALVE_EXHAUST,HIGH); 
-  delay(100);
-
-  //habilitar interrupts
-  interrupts();
 }
+
+void FnReadSerial(){
+  if (Serial.available() > 0) {
+    String command = Serial.readStringUntil('\n');
+    command.trim();
+
+    if (command == "CM_VALVE01") {
+      // Dispensar 1
+      FnStartDispensing(1);
+    } else if (command == "CM_VALVE02") {
+      // Dispensar 2
+      FnStartDispensing(2);
+    } else if (command == "CM_VALVE03") {
+      // Dispensar 3
+      FnStartDispensing(3);
+    } else if (command == "CM_VALVE04") {
+      // Dispensar 4
+      FnStartDispensing(4);
+    } else if (command == "CM_VALVE05") {
+      // Dispensar 5
+      FnStartDispensing(5);
+    } else if (command == "CM_VALVE06") {
+      // Dispensar 6
+      FnStartDispensing(6);
+    } else if (command == "CM_VALVE07") {
+      // Dispensar 7
+      FnStartDispensing(7);
+    } else if (command == "CM_VALVE08") {
+      // Dispensar 8
+      FnStartDispensing(8);
+    } else {
+      Serial.print("Unknown command: ");
+      Serial.println(command);
+    }
+  }
+}
+
 
 void setup() {
 
@@ -101,33 +284,45 @@ void setup() {
   Serial.begin(115200); // Debug
   Serial2.begin(115200, SERIAL_8N1, COMM_RX_02, COMM_TX_02); // display
 
-  FnCleanCycle();
+  current_state = CLEAN_CYCLE_START;
+
+  currentMillis = millis();
 }
 
+
+
 void loop() {
-  // Calculate flow every second
-  static unsigned long lastTime = 0;
-  
-  if (millis() - lastTime >= 100) {
-    // Disable interrupts while reading
-    noInterrupts();
-    int pulses = pulseCount;
-    pulseCount = 0;
-    interrupts();
-    
-    // Calculate flow rate (adjust calibration factor for your sensor)
-    // Most sensors: pulses per second / calibration factor = L/min
-    flowRate = (pulses / 7.5); // Example: YF-S201 uses 7.5 pulses/L
-    
-    // Add to total volume
-    totalVolume += (flowRate / 60.0); // Convert to liters
-    
-    Serial.print("Flow: ");
-    Serial.print(flowRate);
-    Serial.print(" L/min | Total: ");
-    Serial.print(totalVolume);
-    Serial.println(" L");
-    
-    lastTime = millis();
-  }
+
+  switch(current_state){
+    case WAITING_COMMAND:
+      FnReadSerial();
+    break;
+    case DISPENSE_START:
+      current_state = DISPENSING;
+      currentMillis = millis();
+    break;
+    case DISPENSING:
+      FnReadFlowSensor();
+    break;
+    case DISPENSE_END:
+      FnFinishDispensing();
+    break;
+    case CLEAN_CYCLE_START:
+      FnStartCleanCycle();
+    break;
+    case WATER_CLEAN:
+      FnWaterCleanCycle();
+    break;
+    case AIR_CLEAN:
+      FnAirCleanCycle();
+    break;
+    case CLEAN_CYCLE_END:
+      FnEndCleanCycle();
+    break;
+  } 
 }
+
+
+
+
+
