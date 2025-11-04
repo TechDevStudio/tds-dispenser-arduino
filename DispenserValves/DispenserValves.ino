@@ -19,7 +19,7 @@
 #define COMM_TX_02 17
 
 //constantes de tiempo
-#define TIMEOUT_NO_FLOW 5000 //segundos de inactividad para terminar proceso
+#define TIMEOUT_NO_FLOW 10000 //segundos de inactividad para terminar proceso
 #define WATER_TIME 2000 //tiempo de agua en limpieza
 #define AIR_TIME 2000 //tiempo de aire en limpieza
 #define SAFE_DELAY_INTER_PROCESS 200 //tiiempo de espera entre activaciones y desactivaciones
@@ -52,12 +52,17 @@ unsigned long lastUpdateTime = 0;
 unsigned long lastPulseSnapshot = 0;
 unsigned long currentMillis = 0;
 
+bool firstRun=true;
+
 void IRAM_ATTR flowSensorISR() {
   totalPulses++;
   lastPulseTime = millis();
 }
 
 void FnPrintSerial(String message, bool new_line){
+  if(firstRun){
+    return;
+  }
   if(new_line){
     Serial.println(message);
     Serial2.println(message);
@@ -140,6 +145,7 @@ void FnReadFlowSensor(){
 void FnFinishDispensing(){
   FnCloseAllValves();
   current_state = CLEAN_CYCLE_START;
+  FnPrintSerial("RSP_DISPENSE_END",true);
 }
 
 
@@ -194,6 +200,7 @@ void FnEndCleanCycle(){
     FnPrintSerial("CM_READY",true);
     current_state = WAITING_COMMAND;
     currentMillis = millis();
+    firstRun = false;
   }
 }
 

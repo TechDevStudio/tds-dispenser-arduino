@@ -194,11 +194,9 @@ bool readingTag = false;
 unsigned long lastRFIDCheck = 0;
 
 // Valve Controller Serial Communication
-//HardwareSerial valveSerial(1);  // UART1 for valve controller
 #define VALVE_RX_PIN 18  // Adjust based on your wiring
 #define VALVE_TX_PIN 17  // Adjust based on your wiring
 String valveCommand = "";
-//bool waitingForDispenseComplete = false;
 
 void IRAM_ATTR onRFIDData() {
   dataAvailable = true;
@@ -208,6 +206,7 @@ void IRAM_ATTR onRFIDData() {
 void sendCommandToValveController(String command);
 void processValveControllerResponse();
 void onDispenseComplete(float volumeMl);
+void onDispensePartial(float volumeMl);
 void onValveControllerReady();
 
 // Forward declarations for UI (using UIBuilder)
@@ -222,12 +221,6 @@ float totalVolumeDispensed = 0.0;
 int selectedDispenserBeverageId = -1;
 unsigned long lastDispenseTime = 0;
 unsigned long inactivityTimeout = 10000;  // 10 seconds of inactivity to end session
-
-void LogMessages(){
-  if (DEBUG){
-
-  }
-}
 
 void connectToWiFi() {
   Serial.print("Connecting to WiFi...");
@@ -346,30 +339,7 @@ void setup() {
 
   lcd.begin();
   Serial.println("LCD begin done");
-/*
-  // More extensive LCD hardware test
-  Serial.println("Testing LCD with color patterns...");
 
-  // Test 1: Fill with RED
-  lcd.fillScreen(TFT_RED);
-  Serial.println("Screen should be RED");
-  delay(1000);
-
-  // Test 2: Fill with GREEN
-  lcd.fillScreen(TFT_GREEN);
-  Serial.println("Screen should be GREEN");
-  delay(1000);
-
-  // Test 3: Fill with BLUE
-  lcd.fillScreen(TFT_BLUE);
-  Serial.println("Screen should be BLUE");
-  delay(1000);
-
-  // Test 4: Fill with WHITE
-  lcd.fillScreen(TFT_WHITE);
-  Serial.println("Screen should be WHITE");
-  delay(1000);
-*/
   // Test 5: Draw some rectangles
   lcd.fillScreen(TFT_BLACK);
   lcd.fillRect(100, 100, 200, 100, TFT_YELLOW);
@@ -422,16 +392,12 @@ void setup() {
   // Initialize RFID serial on pin 38 (RX only)
   rfidSerial.begin(9600, SERIAL_8N1, RX_RFREADER_PIN, TX_RFREADER_PIN);
   rfidSerial.setRxBufferSize(256);
+
   // Attach interrupt to UART RX
   rfidSerial.onReceive(onRFIDData, false);
   Serial.println("RDM6300 RFID Reader initialized on pin 38");
-  Serial.println("Waiting for RFID cards...");
 
-  // Initialize Valve Controller serial communication
-  //valveSerial.begin(9600, SERIAL_8N1, VALVE_RX_PIN, VALVE_TX_PIN);
-  //valveSerial.setRxBufferSize(256);
-  Serial.println("Valve controller serial initialized on pins 17/18");
-  sendCommandToValveController("READY");  // Send ready signal
+  //sendCommandToValveController("READY");  // Send ready signal
 
   uint64_t chip_id = ESP.getEfuseMac();
   char id[32];
@@ -499,16 +465,6 @@ void loop() {
     Serial.println(" loaded)");
   }
 
-  // Check if screen status changed
-  /*if (screen_status != previousScreenStatus) {
-    Serial.print("[DEBUG] Screen status changed from ");
-    Serial.print(previousScreenStatus);
-    Serial.print(" to ");
-    Serial.println(screen_status);
-    lastScreenChange = millis();
-    stateTimer = millis();
-    previousScreenStatus = screen_status;
-  }*/
 
   switch (screen_status){
     case 0:
@@ -618,9 +574,18 @@ void loop() {
         // Send cleaning command to valve controller
         sendCommandToValveController("CLEAN");
         stateTimer = millis();
-      }
+        previousScreenStatus = screen_status;
 
-      if (millis() - stateTimer > 3000) {
+        // Clear the session
+        mqttManager.clearWristbandSession();
+        totalVolumeDispensed = 0.0;
+        selectedDispenserBeverageId = -1;
+        //waitingForDispenseComplete = false;
+
+      }
+      processValveControllerResponse();
+      
+      /*if (millis() - stateTimer > 3000) {
         Serial.println("[DEBUG] Returning to RFID scan");
 
         // Clear the session
@@ -634,7 +599,7 @@ void loop() {
 
         // Return to RFID scanning
         screen_status = 1;
-      }
+      }*/
       break;
 
     default:
@@ -767,7 +732,8 @@ void processValveControllerResponse() {
           onDispensePartial(volume);
         }
         else if (valveCommand == "CM_READY") {
-          onValveControllerReady();
+          //onValveControllerReady();
+          screen_status = 1;
         }
         else if (valveCommand == "CLEAN_STARTED") {
           Serial.println("[DEBUG] Cleaning complete");
@@ -804,7 +770,7 @@ void onDispenseComplete(float volumeMl) {
 
 void onValveControllerReady() {
   Serial.println("[DEBUG] Valve controller is ready");
-  screen_status = 0;
+  //screen_status = 1;
   // Can be used to ensure valve controller is ready before operations
 }
 
