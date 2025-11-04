@@ -12,6 +12,7 @@
 // Buffer size
 #define DRAW_BUF_SIZE ((SCREEN_WIDTH * SCREEN_HEIGHT / 10) * (sizeof(uint16_t)))
 
+#define DEBUG true
 // WiFi credentials
 const char* WIFI_SSID = "DD-Simba";
 const char* WIFI_PASSWORD = "zombie@1502";
@@ -19,5 +20,7 @@ const char* WIFI_PASSWORD = "zombie@1502";
 // MQTT settings
 const char* MQTT_BROKER = "192.168.220.105";
 const int MQTT_PORT = 1883;
+const char* MQTT_USER = "dispenser_user";
+const char* MQTT_PASSWORD = "tds@dispenser";
 
 #endif

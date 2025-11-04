@@ -6,8 +6,15 @@
 #include "ui.h"
 
 lv_obj_t *ui_SC03Dispensar = NULL;lv_obj_t *ui_SC03Title = NULL;lv_obj_t *ui_Spinbox1 = NULL;lv_obj_t *ui_BarDispensed = NULL;lv_obj_t *ui_Image1 = NULL;lv_obj_t *ui_BtnFinalizr = NULL;
+//*ui_BtnFinalizr = null;
 // event funtions
-
+/*
+void ui_event_BtnFinalizr_BtnFinalizr( lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+if ( event_code == LV_EVENT_CLICKED) {
+      
+}
+}*/
 // build funtions
 
 void ui_SC03Dispensar_screen_init(void)
@@ -91,6 +98,7 @@ lv_obj_set_y( ui_BtnFinalizr, 195 );
 lv_obj_set_style_text_font(ui_BtnFinalizr, &lv_font_montserrat_20, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 lv_label_set_text(ui_comp_get_child(ui_BtnFinalizr, UI_COMP_BTNNEXTCOMP_LABEL5),"Finalizar");
+
 
 }
 

@@ -60,6 +60,7 @@ void IRAM_ATTR flowSensorISR() {
 void FnPrintSerial(String message, bool new_line){
   if(new_line){
     Serial.println(message);
+    Serial2.println(message);
   }else{
     Serial.print(message);
   }
@@ -119,20 +120,21 @@ void FnReadFlowSensor(){
     unsigned long timeDelta = currentTime - lastUpdateTime;
     float flowRate = (pulsesSinceLastUpdate / CALIBRATION_FACTOR) * (60000.0 / timeDelta); // L/min
     
-    FnPrintSerial("Volume: ",false);
-    FnPrintSerial(String(totalVolume,0),false);
-    FnPrintSerial(" mL | Flow: ",false);
-    FnPrintSerial(String(flowRate,2),false);
-    FnPrintSerial(" L/min",true);
+    FnPrintSerial("RSP_PARTIAL_VOLUME:" + String(totalVolume,0),true);
+    //FnPrintSerial(String(flowRate,2),false);
+    //FnPrintSerial(" L/min",true);
     
     lastPulseSnapshot = pulses;
     lastUpdateTime = currentTime;
+
+    // Check for flow timeout
+    if (currentTime - lastPulseTime > TIMEOUT_NO_FLOW) {
+      current_state = DISPENSE_END;
+      FnPrintSerial("RSP_TOTAL_VOLUME:" + String(totalVolume,0),true);
+    }
   }
   
-  // Check for flow timeout
-  if (currentTime - lastPulseTime > TIMEOUT_NO_FLOW) {
-    current_state = DISPENSE_END;
-  }
+
 }
 
 void FnFinishDispensing(){
@@ -224,8 +226,8 @@ void FnCloseAllValves(){
 }
 
 void FnReadSerial(){
-  if (Serial.available() > 0) {
-    String command = Serial.readStringUntil('\n');
+  if (Serial2.available() > 0) {
+    String command = Serial2.readStringUntil('\n');
     command.trim();
 
     if (command == "CM_VALVE01") {
@@ -252,7 +254,10 @@ void FnReadSerial(){
     } else if (command == "CM_VALVE08") {
       // Dispensar 8
       FnStartDispensing(8);
-    } else {
+    } else if (command == "CM_FORCEEND") {
+      // Dispensar 8
+      current_state = DISPENSE_END;
+    }else {
       Serial.print("Unknown command: ");
       Serial.println(command);
     }
