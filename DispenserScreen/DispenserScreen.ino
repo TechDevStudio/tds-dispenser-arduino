@@ -540,7 +540,8 @@ void loop() {
         lv_scr_load_anim(ui_SC02Selection, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, false);
 
         // Populate with available beverages using UIBuilder
-        uiBuilder.buildBeverageSelection();
+        //uiBuilder.buildBeverageSelection();
+        uiBuilder.buildBeverageSelectionGrid();
 
         stateTimer = millis();
         totalVolumeDispensed = 0.0;  // Reset volume for new session
@@ -733,7 +734,9 @@ void processValveControllerResponse() {
         }
         else if (valveCommand == "CM_READY") {
           //onValveControllerReady();
-          screen_status = 1;
+
+          screen_status = 0;
+          beveragesLoaded = false;
         }
         else if (valveCommand == "CLEAN_STARTED") {
           Serial.println("[DEBUG] Cleaning complete");
