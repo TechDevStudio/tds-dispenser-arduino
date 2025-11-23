@@ -219,8 +219,6 @@ bool beveragesLoaded = false;
 // Dispensing session variables
 float totalVolumeDispensed = 0.0;
 int selectedDispenserBeverageId = -1;
-unsigned long lastDispenseTime = 0;
-unsigned long inactivityTimeout = 7000;  // 10 seconds of inactivity to end session
 
 void connectToWiFi() {
   Serial.print("Connecting to WiFi...");
@@ -307,7 +305,7 @@ void onWristbandVerified(bool valid, const char* jsonData) {
     if (!error) {
       if (doc.containsKey("error_info") && !doc["error_info"].isNull()) {
         JsonObject errorInfo = doc["error_info"];
-        const char* errorMsg = errorInfo["err_message"] | "Wristband not active";
+        const char* errorMsg = errorInfo["err_message"] | "La pulsera no se encuentra activa";
         lv_label_set_text(ui_LblErrorMessage, errorMsg);
 
         // Log error details
@@ -317,7 +315,7 @@ void onWristbandVerified(bool valid, const char* jsonData) {
         Serial.print(" - ");
         Serial.println(errorMsg);
       } else {
-        lv_label_set_text(ui_LblErrorMessage, "Wristband not active");
+        lv_label_set_text(ui_LblErrorMessage, "Pulsera no se encuentra activa");
       }
     } else {
       lv_label_set_text(ui_LblErrorMessage, "Error reading response");
@@ -464,6 +462,7 @@ void loop() {
     Serial.print(" (");
     Serial.print(beverageManager.getCount());
     Serial.println(" loaded)");
+    lv_label_set_text(ui_LblErrorMessage, "");
   }
 
 

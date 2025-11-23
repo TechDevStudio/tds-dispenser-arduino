@@ -14,8 +14,8 @@
 
 #define DEBUG true
 // WiFi credentials
-const char* WIFI_SSID = "DD-Simba";
-const char* WIFI_PASSWORD = "zombie@1502";
+const char* WIFI_SSID = "DD-DSPNSR-NTWRK";
+const char* WIFI_PASSWORD = "2glNhN600r7wLtnquS";
 
 // MQTT settings
 const char* MQTT_BROKER = "192.168.220.105";
