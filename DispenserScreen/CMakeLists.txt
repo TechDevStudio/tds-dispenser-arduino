@@ -11,7 +11,10 @@ SET(SOURCES ui_comp_btnnextcomp.c
     ui.c
     ui_comp_hook.c
     ui_helpers.c
-    ui_img_scan_200_png.c
-    ui_img_pouring_200_png.c)
+    ui_img_wristband_green_png.c
+    ui_img_rfid_png.c
+    ui_img_cocktail_png.c
+    ui_img_beer_mug_png.c
+    ui_img_red_wine_png.c)
 
 add_library(ui ${SOURCES})

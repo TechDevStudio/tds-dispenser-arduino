@@ -83,10 +83,10 @@ void MQTTManager::connect() {
                 Serial.println("✗ FAILED to subscribe to: " + wristRegActDetailResponseTopic);
             }
 
-            // Also try subscribing to wildcard to see ALL messages (for debugging)
-            if (mqttClient.subscribe("#")) {
-                Serial.println("✓ Subscribed to ALL topics (#) for debugging");
-            }
+            // // Also try subscribing to wildcard to see ALL messages (for debugging)
+            // if (mqttClient.subscribe("#")) {
+            //     Serial.println("✓ Subscribed to ALL topics (#) for debugging");
+            // }
             Serial.println("================================\n");
 
         } else {
@@ -190,13 +190,14 @@ void MQTTManager::requestBeverages() {
 
     JsonObject filter = doc.createNestedObject("filter");
     filter["dispenser_id"] = dispenserId;
-    filter["enabled"] = true;
+    filter["beverage_enabled"] = true;
 
     char buffer[512];
     serializeJson(doc, buffer);
 
     Serial.println("Requesting beverages: " + String(buffer));
     String topic = "disp-bev/get-bev/" + hardwareId;
+    Serial.println(topic);
     mqttClient.publish(topic.c_str(), buffer);
 }
 
@@ -233,7 +234,7 @@ void MQTTManager::messageCallback(char* topic, byte* payload, unsigned int lengt
     Serial.println(length);
 
     // Check if message is too large
-    const size_t MAX_MESSAGE_SIZE = 4096;
+    const size_t MAX_MESSAGE_SIZE = 6020;
     if (length > MAX_MESSAGE_SIZE) {
         Serial.print("ERROR: Message too large! Size: ");
         Serial.print(length);

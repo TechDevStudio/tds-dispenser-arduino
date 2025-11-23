@@ -7,15 +7,18 @@
 struct Beverage {
   int dispenser_beverage_id;
   int dispenser_valve;
+  bool dispenser_beverage_enabled;
+  bool dispenser_enabled;
+  double barrel_volume_ml;
   int beverage_id;
   String beverage_name;
   String beverage_description;
   float unit_price;
   int unit;
   String beverage_color_code;
-  String beverage_image_url;  // For URL-based images
-  String beverage_image_b64;   // For base64 encoded images (stored but may not display due to memory limits)
-  bool enabled;
+  bool beverage_enabled;
+  int beverage_category_type_id;
+  String beverage_category_type_description;
 };
 
 class BeverageManager {
@@ -39,7 +42,7 @@ public:
     beverages[beverageCount].beverage_name = String(name);
     beverages[beverageCount].beverage_color_code = String(colorCode);
     beverages[beverageCount].unit_price = price;
-    beverages[beverageCount].enabled = true;
+    beverages[beverageCount].beverage_enabled = true;
     beverageCount++;
   }
 
@@ -62,7 +65,7 @@ public:
     beverageCount = 0;
     
     for (JsonObject beverage : data) {
-      if (!beverage["enabled"].as<bool>()) continue;
+      if (!beverage["beverage_enabled"].as<bool>()) continue;
 
       beverages[beverageCount].dispenser_beverage_id = beverage["dispenser_beverage_id"];
       beverages[beverageCount].dispenser_valve = beverage["dispenser_valve"];
@@ -72,20 +75,9 @@ public:
       beverages[beverageCount].unit_price = beverage["unit_price"];
       beverages[beverageCount].unit = beverage["unit"];
       beverages[beverageCount].beverage_color_code = beverage["beverage_color_code"].as<String>();
-
-      // Handle image data - prefer URL over base64 for memory efficiency
-      if (beverage.containsKey("beverage_image") && !beverage["beverage_image"].isNull()) {
-        beverages[beverageCount].beverage_image_url = beverage["beverage_image"].as<String>();
-      }
-      // Only store base64 if no URL and it's reasonably small (to avoid memory issues)
-      else if (beverage.containsKey("beverage_image_b64") && !beverage["beverage_image_b64"].isNull()) {
-        String b64 = beverage["beverage_image_b64"].as<String>();
-        if (b64.length() < 10000) {  // Limit to ~10KB base64 strings
-          beverages[beverageCount].beverage_image_b64 = b64;
-        }
-      }
-
-      beverages[beverageCount].enabled = beverage["enabled"];
+      beverages[beverageCount].beverage_category_type_id = beverage["beverage_category_type_id"];
+      beverages[beverageCount].beverage_category_type_description = beverage["beverage_category_type_description"].as<String>();
+      beverages[beverageCount].beverage_enabled = beverage["beverage_enabled"];
 
       beverageCount++;
       if (beverageCount >= 10) break;

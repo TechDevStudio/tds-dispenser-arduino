@@ -26,8 +26,8 @@
 #define UPDATE_READ_INTERVAL 200 //milisegundos para lectura
 
 //constantes de flujo
-#define SAFE_LOWFLOW_THRESHOLD 0.1 //bajo esto asumimos no hay dispensado
-#define CALIBRATION_FACTOR 7.5
+#define SAFE_LOWFLOW_THRESHOLD 0.3 //bajo esto asumimos no hay dispensado
+#define CALIBRATION_FACTOR 4380.0
 
 #define DEBUG true
 

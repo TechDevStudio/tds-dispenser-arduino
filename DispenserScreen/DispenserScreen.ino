@@ -220,7 +220,7 @@ bool beveragesLoaded = false;
 float totalVolumeDispensed = 0.0;
 int selectedDispenserBeverageId = -1;
 unsigned long lastDispenseTime = 0;
-unsigned long inactivityTimeout = 10000;  // 10 seconds of inactivity to end session
+unsigned long inactivityTimeout = 7000;  // 10 seconds of inactivity to end session
 
 void connectToWiFi() {
   Serial.print("Connecting to WiFi...");
@@ -440,6 +440,7 @@ void loop() {
   static unsigned long stateTimer = 0;
   static int previousScreenStatus = -1;
   static unsigned long lastStatusDebug = 0;
+  static unsigned long lastAttemptToGetData = 0;
 
   lv_tick_inc(millis() - lastTick);
   lastTick = millis();
@@ -498,7 +499,10 @@ void loop() {
           Serial.println("[DEBUG] Still waiting for dispenser ID");
         }
         if (!beveragesLoaded) {
-          Serial.println("[DEBUG] Still waiting for beverages");
+          if(millis() - lastAttemptToGetData > 2000){
+            Serial.println("[DEBUG] Still waiting for beverages");
+            mqttManager.requestBeverages();
+          }
         }
       }
       break;
@@ -512,6 +516,7 @@ void loop() {
         lastScreenChange = millis();
         stateTimer = millis();
         previousScreenStatus = screen_status;
+        lv_label_set_text(ui_LblErrorMessage, "");
       }
 
       // Check for RFID data
@@ -556,6 +561,7 @@ void loop() {
       // Dispensing state - waiting for valve controller feedback
       if (screen_status != previousScreenStatus) {
         onDispensePartial(0);
+        uiBuilder.updateDispenseScreen();  // Update the UI with selected beverage color and icon
         lv_scr_load_anim(ui_SC03Dispensar, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, false);
         Serial.println("[DEBUG] Dispensing screen shown, waiting for valve controller...");
         //waitingForDispenseComplete = true;
@@ -684,6 +690,9 @@ void handleRFIDTag(String tagID) {
 void selectBeverage(int beverageIndex) {
   Beverage* bev = beverageManager.getBeverage(beverageIndex);
   if (bev) {
+    // Store the selected beverage index in BeverageManager
+    beverageManager.setSelected(beverageIndex);
+
     selectedDispenserBeverageId = bev->dispenser_beverage_id;
     mqttManager.setCurrentBeverage(selectedDispenserBeverageId);
 
@@ -754,7 +763,7 @@ void processValveControllerResponse() {
 
 void onDispensePartial(float volumeMl) {
   lv_spinbox_set_value(ui_Spinbox1, volumeMl); 
-  int percentage = map(volumeMl, 0, 2000, 0, 100);
+  int percentage = map(volumeMl, 0, 3000, 0, 100);
   lv_bar_set_value(ui_BarDispensed, percentage, LV_ANIM_ON);
 }
 
