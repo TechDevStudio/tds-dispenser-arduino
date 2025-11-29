@@ -326,6 +326,12 @@ void onWristbandVerified(bool valid, const char* jsonData) {
   }
 }
 
+void finalizarForzado(){
+ Serial.println("CM_FORCEEND");
+  //lv_scr_load_anim(ui_SC03Dispensar, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, false);
+  screen_status = 4;
+}
+
 void setup() {
   Serial.begin(115200);
   delay(1000); // Wait for serial
@@ -553,6 +559,10 @@ void loop() {
         lastScreenChange = millis();
         stateTimer = millis();
         previousScreenStatus = screen_status;
+      }
+      // Check for no selection timeout
+      if (millis() - stateTimer > TIMEOUT_NO_SELECTION) {
+        finalizarForzado();
       }
       break;
 
@@ -801,9 +811,8 @@ void onBeverageCardClicked(int beverageIndex) {
   }
 }
 
+
 // Handler function - goes to selection screen
 void btn_sc03finalizar_clicked(lv_event_t * e) {
-  Serial.println("CM_FORCEEND");
-  //lv_scr_load_anim(ui_SC03Dispensar, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, false);
-  screen_status = 4;
+ finalizarForzado();
 }

@@ -12,13 +12,15 @@
 // Buffer size
 #define DRAW_BUF_SIZE ((SCREEN_WIDTH * SCREEN_HEIGHT / 10) * (sizeof(uint16_t)))
 
-#define DEBUG true
+#define DEBUG false
+#define TIMEOUT_NO_SELECTION 10000 //segundos de inactividad para terminar proceso
+
 // WiFi credentials
 const char* WIFI_SSID = "DD-DSPNSR-NTWRK";
 const char* WIFI_PASSWORD = "2glNhN600r7wLtnquS";
 
 // MQTT settings
-const char* MQTT_BROKER = "192.168.220.105";
+const char* MQTT_BROKER = "mqtt-disp.techdev-studio.com"; //"192.168.220.105";
 const int MQTT_PORT = 1883;
 const char* MQTT_USER = "dispenser_user";
 const char* MQTT_PASSWORD = "tds@dispenser";

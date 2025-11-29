@@ -31,6 +31,9 @@
 
 #define DEBUG true
 
+#define VALVE_ON false
+#define VALVE_OFF true
+
 //flujo del proceso
 enum FlowState{
   WAITING_COMMAND,
@@ -79,21 +82,21 @@ void FnStartDispensing(int valve_id){
 
   //abrimos primero valvula de producto
   if (valve_id == 1){
-    digitalWrite(VALVE_01,LOW); 
+    digitalWrite(VALVE_01,VALVE_OFF); 
   }else if(valve_id == 2){
-    digitalWrite(VALVE_02,LOW); 
+    digitalWrite(VALVE_02,VALVE_OFF); 
   }else if(valve_id == 3){
-    digitalWrite(VALVE_03,LOW); 
+    digitalWrite(VALVE_03,VALVE_OFF); 
   }else if(valve_id == 4){
-    digitalWrite(VALVE_04,LOW); 
+    digitalWrite(VALVE_04,VALVE_OFF); 
   }else if(valve_id == 5){
-    digitalWrite(VALVE_05,LOW); 
+    digitalWrite(VALVE_05,VALVE_OFF); 
   }else if(valve_id == 6){
-    digitalWrite(VALVE_06,LOW); 
+    digitalWrite(VALVE_06,VALVE_OFF); 
   }else if(valve_id == 7){
-    digitalWrite(VALVE_07,LOW); 
+    digitalWrite(VALVE_07,VALVE_OFF); 
   }else if(valve_id == 8){
-    digitalWrite(VALVE_08,LOW); 
+    digitalWrite(VALVE_08,VALVE_OFF); 
   }
   delay(100);
 
@@ -156,7 +159,7 @@ void FnStartCleanCycle(){
   //noInterrupts();
 
   //abrir valvula de exhaust
-  digitalWrite(VALVE_EXHAUST,LOW); 
+  digitalWrite(VALVE_EXHAUST,VALVE_OFF); 
   
   current_state = WATER_CLEAN;
   currentMillis = millis();
@@ -164,14 +167,14 @@ void FnStartCleanCycle(){
 
 void FnWaterCleanCycle(){
   //abrir agua
-  digitalWrite(VALVE_WATER,LOW);
+  digitalWrite(VALVE_WATER,VALVE_OFF);
   //FnPrintSerial(String(currentMillis),false);
   //FnPrintSerial("FnWaterCleanCycle",false);
   //FnPrintSerial(String(millis()),true);
 
   if(millis() > currentMillis + WATER_TIME){
     //cerrar agua
-    digitalWrite(VALVE_WATER,HIGH);
+    digitalWrite(VALVE_WATER,VALVE_ON);
     current_state = AIR_CLEAN;
     currentMillis = millis();
   }
@@ -179,13 +182,13 @@ void FnWaterCleanCycle(){
 
 void FnAirCleanCycle(){
   //abrir aire
-  digitalWrite(VALVE_AIR,LOW);
+  digitalWrite(VALVE_AIR,VALVE_OFF);
   //FnPrintSerial(String(currentMillis),false);
   //FnPrintSerial("FnAirCleanCycle",false);
   //FnPrintSerial(String(millis()),true);
   if(millis() > currentMillis + AIR_TIME){
     //cerrar aire
-    digitalWrite(VALVE_AIR,HIGH);
+    digitalWrite(VALVE_AIR,VALVE_ON);
     current_state = CLEAN_CYCLE_END;
     currentMillis = millis();
   }
@@ -193,7 +196,7 @@ void FnAirCleanCycle(){
 
 void FnEndCleanCycle(){
   //cerrar exhaust
-  digitalWrite(VALVE_EXHAUST,HIGH); 
+  digitalWrite(VALVE_EXHAUST,VALVE_ON); 
   //FnPrintSerial("CLEAN_FINISHED",true);
   if(millis() > currentMillis + SAFE_DELAY_INTER_PROCESS){
     //interrupts();
@@ -214,20 +217,20 @@ void FnResetVariables(){
 }
 
 void FnCloseAllValves(){
-  digitalWrite(VALVE_01,HIGH);  
-  digitalWrite(VALVE_02,HIGH);
-  digitalWrite(VALVE_03,HIGH);  
-  digitalWrite(VALVE_04,HIGH);
-  digitalWrite(VALVE_05,HIGH);  
-  digitalWrite(VALVE_06,HIGH);
-  digitalWrite(VALVE_07,HIGH);  
-  digitalWrite(VALVE_08,HIGH);
+  digitalWrite(VALVE_01,VALVE_ON);  
+  digitalWrite(VALVE_02,VALVE_ON);
+  digitalWrite(VALVE_03,VALVE_ON);  
+  digitalWrite(VALVE_04,VALVE_ON);
+  digitalWrite(VALVE_05,VALVE_ON);  
+  digitalWrite(VALVE_06,VALVE_ON);
+  digitalWrite(VALVE_07,VALVE_ON);  
+  digitalWrite(VALVE_08,VALVE_ON);
   
-  digitalWrite(VALVE_EXHAUST,HIGH);  
-  digitalWrite(VALVE_AIR,HIGH);
-  digitalWrite(VALVE_WATER,HIGH);  
+  digitalWrite(VALVE_EXHAUST,VALVE_ON);  
+  digitalWrite(VALVE_AIR,VALVE_ON);
+  digitalWrite(VALVE_WATER,VALVE_ON);  
   
-  digitalWrite(VALVE_SECOUT,HIGH);
+  digitalWrite(VALVE_SECOUT,VALVE_ON);
 
   delay(300);
 }
