@@ -504,7 +504,8 @@ void loop() {
           Serial.println("[DEBUG] Still waiting for dispenser ID");
         }
         if (!beveragesLoaded) {
-          if(millis() - lastAttemptToGetData > 2000){
+          if(millis() - lastAttemptToGetData > 5000){
+            lastAttemptToGetData = millis();
             Serial.println("[DEBUG] Still waiting for beverages");
             mqttManager.requestBeverages();
           }
