@@ -433,7 +433,7 @@ void setup() {
 
   // Add click handler to Next button
   //lv_obj_add_event_cb(ui_BtnNextComp, btn_sc03finalizar_clicked, LV_EVENT_CLICKED, NULL);
-  lv_obj_add_event_cb(ui_BtnFinalizr, btn_sc03finalizar_clicked, LV_EVENT_CLICKED, NULL);
+  lv_obj_add_event_cb(ui_BtnFinalizr1, btn_sc03finalizar_clicked, LV_EVENT_CLICKED, NULL);
   
   screen_status = 0;
   
@@ -626,6 +626,12 @@ void loop() {
   delay(5);
 }
 
+static String lastScannedTag = "";
+static unsigned long lastScanTime = 0;
+const unsigned long SCAN_DEBOUNCE_MS = 5000;  // 5 seconds
+
+
+
 void processRFIDReading() {
   dataAvailable = false;
   Serial.println("[DEBUG] Processing RFID reading...");
@@ -680,6 +686,15 @@ void handleRFIDTag(String tagID) {
   Serial.println(tagID);
   Serial.print("[DEBUG] Current screen status: ");
   Serial.println(screen_status);
+unsigned long currentTime = millis();
+  if (tagID == lastScannedTag && (currentTime - lastScanTime) < SCAN_DEBOUNCE_MS) {
+    Serial.println("[RFID] Duplicate scan ignored - debounce active");
+    return;
+  }
+  
+  lastScannedTag = tagID;
+  lastScanTime = currentTime;
+
 
   // Show processing message
   lv_label_set_text(ui_LblErrorMessage, "Verificando pulsera...");

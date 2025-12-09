@@ -14,9 +14,9 @@ extern "C" {
 extern void ui_SC04Finalizar_screen_init(void);
 extern void ui_SC04Finalizar_screen_destroy(void);
 extern lv_obj_t *ui_SC04Finalizar;
-extern lv_obj_t *ui_Spinner3;
-extern lv_obj_t *ui_Label7;
+extern lv_obj_t *ui_Image6;
 extern lv_obj_t *ui_Label6;
+extern lv_obj_t *ui_Spinner3;
 // CUSTOM VARIABLES
 
 #ifdef __cplusplus

@@ -5,10 +5,10 @@
 
 #include "ui.h"
 
-const ui_theme_variable_t _ui_theme_color_ColorBtn[1] = {0x4138B4};
+const ui_theme_variable_t _ui_theme_color_ColorBtn[1] = {0x201C20};
 const ui_theme_variable_t _ui_theme_alpha_ColorBtn[1] = {255};
 
-const ui_theme_variable_t _ui_theme_color_ColorTxt[1] = {0xFCFCFC};
+const ui_theme_variable_t _ui_theme_color_ColorTxt[1] = {0xE5E6E5};
 const ui_theme_variable_t _ui_theme_alpha_ColorTxt[1] = {255};
 
 const ui_theme_variable_t _ui_theme_color_ColorBgr[1] = {0x000000};

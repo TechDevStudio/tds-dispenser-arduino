@@ -16,6 +16,7 @@ extern void ui_SC02Selection_screen_destroy(void);
 extern lv_obj_t *ui_SC02Selection;
 extern lv_obj_t *ui_SC02Title;
 extern lv_obj_t *ui_ContOptions;
+extern lv_obj_t *ui_Image4;
 // CUSTOM VARIABLES
 
 #ifdef __cplusplus

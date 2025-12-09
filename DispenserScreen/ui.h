@@ -42,10 +42,12 @@ extern "C" {
 extern lv_obj_t *ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
+LV_IMG_DECLARE( ui_img_naos_oscuro_h_png);   // assets/Naos_Oscuro_h.png
 LV_IMG_DECLARE( ui_img_wristband_green_png);   // assets/wristband_green.png
 LV_IMG_DECLARE( ui_img_rfid_png);   // assets/rfid.png
-LV_IMG_DECLARE( ui_img_cocktail_png);   // assets/cocktail.png
+LV_IMG_DECLARE( ui_img_naos_claro_h_png);   // assets/Naos_Claro_h.png
 LV_IMG_DECLARE( ui_img_beer_mug_png);   // assets/beer_mug.png
+LV_IMG_DECLARE( ui_img_cocktail_png);   // assets/cocktail.png
 LV_IMG_DECLARE( ui_img_red_wine_png);   // assets/red_wine.png
 
 // UI INIT

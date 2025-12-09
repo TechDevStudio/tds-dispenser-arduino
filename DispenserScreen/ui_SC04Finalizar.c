@@ -5,7 +5,7 @@
 
 #include "ui.h"
 
-lv_obj_t *ui_SC04Finalizar = NULL;lv_obj_t *ui_Spinner3 = NULL;lv_obj_t *ui_Label7 = NULL;lv_obj_t *ui_Label6 = NULL;
+lv_obj_t *ui_SC04Finalizar = NULL;lv_obj_t *ui_Image6 = NULL;lv_obj_t *ui_Label6 = NULL;lv_obj_t *ui_Spinner3 = NULL;
 // event funtions
 
 // build funtions
@@ -17,43 +17,44 @@ lv_obj_remove_flag( ui_SC04Finalizar, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
 ui_object_set_themeable_style_property(ui_SC04Finalizar, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_BG_COLOR, _ui_theme_color_ColorBgr);
 ui_object_set_themeable_style_property(ui_SC04Finalizar, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_BG_OPA, _ui_theme_alpha_ColorBgr);
 
-ui_Spinner3 = lv_spinner_create(ui_SC04Finalizar);
-//lv_spinner_set_anim_params(ui_Spinner3, 1000, 90);
-lv_obj_set_width( ui_Spinner3, 400);
-lv_obj_set_height( ui_Spinner3, 400);
-lv_obj_set_align( ui_Spinner3, LV_ALIGN_CENTER );
-lv_obj_remove_flag( ui_Spinner3, LV_OBJ_FLAG_CLICKABLE );    /// Flags
-lv_obj_set_style_blend_mode(ui_Spinner3, LV_BLEND_MODE_NORMAL, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_opa(ui_Spinner3, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
-ui_object_set_themeable_style_property(ui_Spinner3, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_ARC_COLOR, _ui_theme_color_ColorWin);
-ui_object_set_themeable_style_property(ui_Spinner3, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_ARC_OPA, _ui_theme_alpha_ColorWin);
-lv_obj_set_style_arc_width(ui_Spinner3, 10, LV_PART_MAIN| LV_STATE_DEFAULT);
+ui_Image6 = lv_image_create(ui_SC04Finalizar);
+lv_image_set_src(ui_Image6, &ui_img_naos_oscuro_h_png);
+lv_obj_set_width( ui_Image6, LV_SIZE_CONTENT);  /// 1
+lv_obj_set_height( ui_Image6, LV_SIZE_CONTENT);   /// 1
+lv_obj_set_x( ui_Image6, -14 );
+lv_obj_set_y( ui_Image6, -22 );
+lv_obj_set_align( ui_Image6, LV_ALIGN_CENTER );
+lv_obj_add_flag( ui_Image6, LV_OBJ_FLAG_CLICKABLE );   /// Flags
+lv_obj_remove_flag( ui_Image6, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
 
-lv_obj_set_style_arc_color(ui_Spinner3, lv_color_hex(0x9A34DB), LV_PART_INDICATOR | LV_STATE_DEFAULT );
-lv_obj_set_style_arc_opa(ui_Spinner3, 255, LV_PART_INDICATOR| LV_STATE_DEFAULT);
-lv_obj_set_style_arc_width(ui_Spinner3, 20, LV_PART_INDICATOR| LV_STATE_DEFAULT);
-
-ui_Label7 = lv_label_create(ui_Spinner3);
-lv_obj_set_width( ui_Label7, LV_SIZE_CONTENT);  /// 1
-lv_obj_set_height( ui_Label7, LV_SIZE_CONTENT);   /// 1
-lv_obj_set_x( ui_Label7, 0 );
-lv_obj_set_y( ui_Label7, -24 );
-lv_obj_set_align( ui_Label7, LV_ALIGN_CENTER );
-lv_label_set_text(ui_Label7,"GRACIAS");
-ui_object_set_themeable_style_property(ui_Label7, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR, _ui_theme_color_ColorTxt);
-ui_object_set_themeable_style_property(ui_Label7, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA, _ui_theme_alpha_ColorTxt);
-lv_obj_set_style_text_font(ui_Label7, &lv_font_montserrat_40, LV_PART_MAIN| LV_STATE_DEFAULT);
-
-ui_Label6 = lv_label_create(ui_Spinner3);
+ui_Label6 = lv_label_create(ui_SC04Finalizar);
 lv_obj_set_width( ui_Label6, LV_SIZE_CONTENT);  /// 1
 lv_obj_set_height( ui_Label6, LV_SIZE_CONTENT);   /// 1
-lv_obj_set_x( ui_Label6, 1 );
-lv_obj_set_y( ui_Label6, 25 );
+lv_obj_set_x( ui_Label6, -1 );
+lv_obj_set_y( ui_Label6, 183 );
 lv_obj_set_align( ui_Label6, LV_ALIGN_CENTER );
 lv_label_set_text(ui_Label6,"Disfruta tu bebida");
 ui_object_set_themeable_style_property(ui_Label6, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_COLOR, _ui_theme_color_ColorTxt);
 ui_object_set_themeable_style_property(ui_Label6, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA, _ui_theme_alpha_ColorTxt);
 lv_obj_set_style_text_font(ui_Label6, &lv_font_montserrat_20, LV_PART_MAIN| LV_STATE_DEFAULT);
+
+ui_Spinner3 = lv_spinner_create(ui_SC04Finalizar);
+//lv_spinner_set_anim_params(ui_Spinner3, 1000, 90);
+lv_obj_set_width( ui_Spinner3, 152);
+lv_obj_set_height( ui_Spinner3, 152);
+lv_obj_set_x( ui_Spinner3, 85 );
+lv_obj_set_y( ui_Spinner3, -24 );
+lv_obj_set_align( ui_Spinner3, LV_ALIGN_CENTER );
+lv_obj_remove_flag( ui_Spinner3, LV_OBJ_FLAG_CLICKABLE );    /// Flags
+lv_obj_set_style_blend_mode(ui_Spinner3, LV_BLEND_MODE_NORMAL, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_opa(ui_Spinner3, 250, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_arc_color(ui_Spinner3, lv_color_hex(0x94959C), LV_PART_MAIN | LV_STATE_DEFAULT );
+lv_obj_set_style_arc_opa(ui_Spinner3, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_arc_width(ui_Spinner3, 10, LV_PART_MAIN| LV_STATE_DEFAULT);
+
+ui_object_set_themeable_style_property(ui_Spinner3, LV_PART_INDICATOR| LV_STATE_DEFAULT, LV_STYLE_ARC_COLOR, _ui_theme_color_ColorBtn);
+ui_object_set_themeable_style_property(ui_Spinner3, LV_PART_INDICATOR| LV_STATE_DEFAULT, LV_STYLE_ARC_OPA, _ui_theme_alpha_ColorBtn);
+lv_obj_set_style_arc_width(ui_Spinner3, 16, LV_PART_INDICATOR| LV_STATE_DEFAULT);
 
 }
 
@@ -63,8 +64,8 @@ void ui_SC04Finalizar_screen_destroy(void)
 
 // NULL screen variables
 ui_SC04Finalizar= NULL;
-ui_Spinner3= NULL;
-ui_Label7= NULL;
+ui_Image6= NULL;
 ui_Label6= NULL;
+ui_Spinner3= NULL;
 
 }

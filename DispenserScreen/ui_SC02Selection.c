@@ -5,7 +5,7 @@
 
 #include "ui.h"
 
-lv_obj_t *ui_SC02Selection = NULL;lv_obj_t *ui_SC02Title = NULL;lv_obj_t *ui_ContOptions = NULL;
+lv_obj_t *ui_SC02Selection = NULL;lv_obj_t *ui_SC02Title = NULL;lv_obj_t *ui_ContOptions = NULL;lv_obj_t *ui_Image4 = NULL;
 // event funtions
 
 // build funtions
@@ -44,6 +44,16 @@ lv_obj_set_scrollbar_mode(ui_ContOptions, LV_SCROLLBAR_MODE_OFF);
 lv_obj_set_style_pad_row(ui_ContOptions, 10, LV_PART_MAIN| LV_STATE_DEFAULT);
 lv_obj_set_style_pad_column(ui_ContOptions, 20, LV_PART_MAIN| LV_STATE_DEFAULT);
 
+ui_Image4 = lv_image_create(ui_SC02Selection);
+lv_image_set_src(ui_Image4, &ui_img_naos_claro_h_png);
+lv_obj_set_width( ui_Image4, LV_SIZE_CONTENT);  /// 1
+lv_obj_set_height( ui_Image4, LV_SIZE_CONTENT);   /// 1
+lv_obj_set_x( ui_Image4, 322 );
+lv_obj_set_y( ui_Image4, -193 );
+lv_obj_set_align( ui_Image4, LV_ALIGN_CENTER );
+lv_obj_add_flag( ui_Image4, LV_OBJ_FLAG_CLICKABLE );   /// Flags
+lv_obj_remove_flag( ui_Image4, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+
 }
 
 void ui_SC02Selection_screen_destroy(void)
@@ -54,5 +64,6 @@ void ui_SC02Selection_screen_destroy(void)
 ui_SC02Selection= NULL;
 ui_SC02Title= NULL;
 ui_ContOptions= NULL;
+ui_Image4= NULL;
 
 }

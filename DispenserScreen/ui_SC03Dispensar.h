@@ -18,7 +18,9 @@ extern lv_obj_t *ui_SC03Title;
 extern lv_obj_t *ui_Spinbox1;
 extern lv_obj_t *ui_BarDispensed;
 extern lv_obj_t *ui_ImageBeverage;
-extern lv_obj_t *ui_BtnFinalizr;
+extern lv_obj_t *ui_BtnFinalizr1;
+extern lv_obj_t *ui_Label1;
+extern lv_obj_t *ui_Image5;
 // CUSTOM VARIABLES
 
 #ifdef __cplusplus

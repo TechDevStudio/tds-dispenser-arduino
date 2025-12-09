@@ -14,8 +14,8 @@ extern "C" {
 extern void ui_SC01Pulsera_screen_init(void);
 extern void ui_SC01Pulsera_screen_destroy(void);
 extern lv_obj_t *ui_SC01Pulsera;
-extern lv_obj_t *ui_TitleScreen01;
 extern lv_obj_t *ui_LblErrorMessage;
+extern lv_obj_t *ui_Image2;
 extern lv_obj_t *ui_Image1;
 extern lv_obj_t *ui_Image3;
 // CUSTOM VARIABLES
