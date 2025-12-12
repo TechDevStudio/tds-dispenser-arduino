@@ -20,8 +20,8 @@
 
 //constantes de tiempo
 #define TIMEOUT_NO_FLOW 10000 //segundos de inactividad para terminar proceso
-#define WATER_TIME 2000 //tiempo de agua en limpieza
-#define AIR_TIME 2000 //tiempo de aire en limpieza
+#define WATER_TIME 3000 //tiempo de agua en limpieza
+#define AIR_TIME 3000 //tiempo de aire en limpieza
 #define SAFE_DELAY_INTER_PROCESS 200 //tiiempo de espera entre activaciones y desactivaciones
 #define UPDATE_READ_INTERVAL 200 //milisegundos para lectura
 
@@ -29,10 +29,10 @@
 #define SAFE_LOWFLOW_THRESHOLD 0.3 //bajo esto asumimos no hay dispensado
 #define CALIBRATION_FACTOR 4380.0
 
-#define DEBUG true
+#define DEBUG false
 
-#define VALVE_ON 0
-#define VALVE_OFF 1
+#define VALVE_ON LOW
+#define VALVE_OFF HIGH
 
 //flujo del proceso
 enum FlowState{
@@ -54,6 +54,7 @@ volatile unsigned long lastPulseTime = 0;
 unsigned long lastUpdateTime = 0;
 unsigned long lastPulseSnapshot = 0;
 unsigned long currentMillis = 0;
+unsigned long currentMillisDemo = 0;
 
 bool firstRun=true;
 
@@ -276,7 +277,6 @@ void FnReadSerial(){
 
 
 void setup() {
-
   
   pinMode(FLOW_SENSOR_PIN, INPUT_PULLUP);
 
@@ -305,12 +305,26 @@ void setup() {
 }
 
 
-
+int i = 0;
 void loop() {
 
   switch(current_state){
     case WAITING_COMMAND:
       FnReadSerial();
+      if(currentMillisDemo + 2000 < millis()){
+        currentMillisDemo = millis();
+        i++;
+        if (i > 8){
+          i=0;
+          currentMillisDemo += 5000;
+          current_state = CLEAN_CYCLE_START;
+        }else{
+          //FnCloseAllValves();
+          FnStartDispensing(i);
+          Serial.println("valve: " + i);
+        }
+
+      }
     break;
     case DISPENSE_START:
       current_state = DISPENSING;
