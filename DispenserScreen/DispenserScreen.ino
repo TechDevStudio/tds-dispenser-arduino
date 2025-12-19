@@ -525,11 +525,11 @@ void loop() {
         lv_label_set_text(ui_LblErrorMessage, "");
       }
 
-      // Check for RFID data
-      if (dataAvailable){
-        Serial.println("[DEBUG] RFID interrupt triggered, processing...");
-        processRFIDReading();
-      }
+      // // Check for RFID data
+      // if (dataAvailable){
+      //   Serial.println("[DEBUG] RFID interrupt triggered, processing...");
+      //   processRFIDReading();
+      // }
 
       // Also poll the serial buffer directly every 100ms as backup
       if (millis() - lastRFIDCheck > 100) {
@@ -634,22 +634,22 @@ const unsigned long SCAN_DEBOUNCE_MS = 5000;  // 5 seconds
 
 void processRFIDReading() {
   dataAvailable = false;
-  Serial.println("[DEBUG] Processing RFID reading...");
-  Serial.print("[DEBUG] Available bytes: ");
-  Serial.println(rfidSerial.available());
+  //Serial.println("[DEBUG] Processing RFID reading...");
+  //Serial.print("[DEBUG] Available bytes: ");
+  //Serial.println(rfidSerial.available());
 
   while (rfidSerial.available()) {
     char c = rfidSerial.read();
-    Serial.print("[DEBUG] Read byte: 0x");
-    Serial.println(c, HEX);
+    //Serial.print("[DEBUG] Read byte: 0x");
+    //Serial.println(c, HEX);
 
     if (c == 0x02) {  // Start byte
       rfidTag = "";
       readingTag = true;
-      Serial.println("[DEBUG] Start byte detected, beginning tag read");
+      //Serial.println("[DEBUG] Start byte detected, beginning tag read");
     }
     else if (c == 0x03) {  // End byte
-      Serial.println("[DEBUG] End byte detected");
+      //Serial.println("[DEBUG] End byte detected");
       if (readingTag && rfidTag.length() == 10) {
         Serial.print("[DEBUG] Valid RFID Tag detected: ");
         Serial.println(rfidTag);
@@ -682,13 +682,13 @@ void processRFIDReading() {
 }
 
 void handleRFIDTag(String tagID) {
-  Serial.print("[DEBUG] Processing RFID tag ID: ");
-  Serial.println(tagID);
-  Serial.print("[DEBUG] Current screen status: ");
-  Serial.println(screen_status);
+  //Serial.print("[DEBUG] Processing RFID tag ID: ");
+  //Serial.println(tagID);
+  //Serial.print("[DEBUG] Current screen status: ");
+  //Serial.println(screen_status);
 unsigned long currentTime = millis();
   if (tagID == lastScannedTag && (currentTime - lastScanTime) < SCAN_DEBOUNCE_MS) {
-    Serial.println("[RFID] Duplicate scan ignored - debounce active");
+    //Serial.println("[RFID] Duplicate scan ignored - debounce active");
     return;
   }
   

@@ -27,7 +27,7 @@
 
 //constantes de flujo
 #define SAFE_LOWFLOW_THRESHOLD 0.3 //bajo esto asumimos no hay dispensado
-#define CALIBRATION_FACTOR 4380.0
+#define CALIBRATION_FACTOR 4385.0
 
 #define DEBUG false
 
@@ -57,6 +57,7 @@ unsigned long currentMillis = 0;
 unsigned long currentMillisDemo = 0;
 
 bool firstRun=true;
+bool demoCycle=true;
 
 void IRAM_ATTR flowSensorISR() {
   totalPulses++;
@@ -311,19 +312,23 @@ void loop() {
   switch(current_state){
     case WAITING_COMMAND:
       FnReadSerial();
-      if(currentMillisDemo + 2000 < millis()){
-        currentMillisDemo = millis();
-        i++;
-        if (i > 8){
-          i=0;
-          currentMillisDemo += 5000;
-          current_state = CLEAN_CYCLE_START;
-        }else{
-          //FnCloseAllValves();
-          FnStartDispensing(i);
-          Serial.println("valve: " + i);
-        }
 
+      if (demoCycle){
+        if(currentMillisDemo + 2000 < millis()){
+          currentMillisDemo = millis();
+          i++;
+          if (i > 8){
+            i=0;
+            FnCloseAllValves();
+            //currentMillisDemo += 5000;
+            demoCycle = false;
+          }else{
+            //FnCloseAllValves();
+            FnStartDispensing(i);
+            Serial.println("valve: " + i);
+          }
+
+        }
       }
     break;
     case DISPENSE_START:
