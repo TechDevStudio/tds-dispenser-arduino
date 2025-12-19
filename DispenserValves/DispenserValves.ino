@@ -57,7 +57,7 @@ unsigned long currentMillis = 0;
 unsigned long currentMillisDemo = 0;
 
 bool firstRun=true;
-bool demoCycle=true;
+bool demoCycle=false;
 
 void IRAM_ATTR flowSensorISR() {
   totalPulses++;
@@ -300,8 +300,9 @@ void setup() {
   Serial.begin(115200); // Debug
   Serial2.begin(115200, SERIAL_8N1, COMM_RX_02, COMM_TX_02); // display
 
-  current_state = CLEAN_CYCLE_START;
+  current_state = WAITING_COMMAND;
 
+  FnCloseAllValves();
   currentMillis = millis();
 }
 
@@ -313,23 +314,23 @@ void loop() {
     case WAITING_COMMAND:
       FnReadSerial();
 
-      if (demoCycle){
-        if(currentMillisDemo + 2000 < millis()){
-          currentMillisDemo = millis();
-          i++;
-          if (i > 8){
-            i=0;
-            FnCloseAllValves();
-            //currentMillisDemo += 5000;
-            demoCycle = false;
-          }else{
-            //FnCloseAllValves();
-            FnStartDispensing(i);
-            Serial.println("valve: " + i);
-          }
+      // if (demoCycle){
+      //   if(currentMillisDemo + 2000 < millis()){
+      //     currentMillisDemo = millis();
+      //     i++;
+      //     if (i > 8){
+      //       i=0;
+      //       FnCloseAllValves();
+      //       //currentMillisDemo += 5000;
+      //       demoCycle = false;
+      //     }else{
+      //       //FnCloseAllValves();
+      //       FnStartDispensing(i);
+      //       Serial.println("valve: " + i);
+      //     }
 
-        }
-      }
+      //   }
+      // }
     break;
     case DISPENSE_START:
       current_state = DISPENSING;

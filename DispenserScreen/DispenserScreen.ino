@@ -215,6 +215,7 @@ int screen_status = -1;
 String hardwareId = "";
 int dispenserId = -1;
 bool beveragesLoaded = false;
+bool serialCommReady = false;
 
 // Dispensing session variables
 float totalVolumeDispensed = 0.0;
@@ -332,6 +333,10 @@ void finalizarForzado(){
   screen_status = 4;
 }
 
+void ForzarLimpieza(){
+ Serial.println("CM_FORCEEND");
+}
+
 void setup() {
   Serial.begin(115200);
   delay(1000); // Wait for serial
@@ -412,15 +417,17 @@ void setup() {
   // Display hardware ID on the registration screen
   char hwIdDisplay[50];
   sprintf(hwIdDisplay, "HW: %s", hardwareId.c_str());
-  lv_label_set_text(ui_LabelId, hwIdDisplay);
-  Serial.print("Setting ui_LabelId to: ");
-  Serial.println(hwIdDisplay);
+  //lv_label_set_text(ui_LabelId, hwIdDisplay);
+  //Serial.print("Setting ui_LabelId to: ");
+  //Serial.println(hwIdDisplay);
 
   // Connect to WiFi
   connectToWiFi();
+  lv_label_set_text(ui_LabelId, "Connecting to WIFI...");
 
   // Initialize MQTT
   if (WiFi.status() == WL_CONNECTED) {
+    lv_label_set_text(ui_LabelId, "Connected");
     mqttManager.init(MQTT_BROKER, MQTT_PORT, hardwareId, MQTT_USER, MQTT_PASSWORD);
     mqttManager.setDispenserIdCallback(onDispenserIdReceived);
     mqttManager.setBeveragesCallback(onBeveragesReceived);
@@ -430,6 +437,7 @@ void setup() {
     // Start registration immediately
     mqttManager.registerHardware();
   }
+
 
   // Add click handler to Next button
   //lv_obj_add_event_cb(ui_BtnNextComp, btn_sc03finalizar_clicked, LV_EVENT_CLICKED, NULL);
@@ -474,18 +482,36 @@ void loop() {
 
   switch (screen_status){
     case 0:
-      // Wait for dispenser ID and beverages - Show registration screen
+            // Wait for dispenser ID and beverages - Show registration screen
       if (screen_status != previousScreenStatus) {
         // Make sure we're on the registration screen
         lv_scr_load_anim(ui_SC00Registrar, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, false);
 
         char statusMsg[100];
         if (!mqttManager.hasDispenserId()) {
-          sprintf(statusMsg, "Registering... HW: %s", hardwareId.c_str());
+          if(millis() - lastAttemptToGetData > 5000){
+            lastAttemptToGetData = millis();
+            mqttManager.registerHardware();
+            sprintf(statusMsg, "Registering... HW: %s", hardwareId.c_str());
+          }
         } else if (!beveragesLoaded) {
-          sprintf(statusMsg, "Loading beverages... ID: %d", dispenserId);
+          
+          if(millis() - lastAttemptToGetData > 5000){
+            lastAttemptToGetData = millis();
+            sprintf(statusMsg, "Loading beverages... ID: %d", dispenserId);
+            mqttManager.requestBeverages();
+          }
+        } else if (!serialCommReady) {
+          
+          if(millis() - lastAttemptToGetData > 10000){
+            lastAttemptToGetData = millis();
+            sprintf(statusMsg, "Communicating with Valves");
+            ForzarLimpieza();
+          }
+          processValveControllerResponse();
         } else {
           sprintf(statusMsg, "Ready - Dispenser: %d", dispenserId);
+          screen_status = 1;
         }
         lv_label_set_text(ui_LabelId, statusMsg);
         Serial.print("[DEBUG] Status screen 0 - Label set to: ");
@@ -493,24 +519,24 @@ void loop() {
       }
 
       // Only proceed when we have both dispenser ID and beverages
-      if (mqttManager.hasDispenserId() && beveragesLoaded) {
-        Serial.println("[DEBUG] Both dispenser ID and beverages loaded, checking timer...");
-        if (millis() - stateTimer > 2000) { // Show ready message for 2 seconds
-          Serial.println("[DEBUG] Timer expired, moving to RFID screen");
-          screen_status = 1;
-        }
-      } else {
-        if (!mqttManager.hasDispenserId()) {
-          Serial.println("[DEBUG] Still waiting for dispenser ID");
-        }
-        if (!beveragesLoaded) {
-          if(millis() - lastAttemptToGetData > 5000){
-            lastAttemptToGetData = millis();
-            Serial.println("[DEBUG] Still waiting for beverages");
-            mqttManager.requestBeverages();
-          }
-        }
-      }
+      // if (mqttManager.hasDispenserId() && beveragesLoaded) {
+      //   Serial.println("[DEBUG] Both dispenser ID and beverages loaded, checking timer...");
+      //   if (millis() - stateTimer > 2000) { // Show ready message for 2 seconds
+      //     Serial.println("[DEBUG] Timer expired, moving to RFID screen");
+      //     screen_status = 1;
+      //   }
+      // } else {
+      //   if (!mqttManager.hasDispenserId()) {
+      //     Serial.println("[DEBUG] Still waiting for dispenser ID");
+      //   }
+      //   if (!beveragesLoaded) {
+      //     if(millis() - lastAttemptToGetData > 5000){
+      //       lastAttemptToGetData = millis();
+      //       Serial.println("[DEBUG] Still waiting for beverages");
+      //       mqttManager.requestBeverages();
+      //     }
+      //   }
+      // }
       break;
 
     case 1:
@@ -771,6 +797,7 @@ void processValveControllerResponse() {
 
           screen_status = 0;
           beveragesLoaded = false;
+          serialCommReady = true;
         }
         else if (valveCommand == "CLEAN_STARTED") {
           Serial.println("[DEBUG] Cleaning complete");
