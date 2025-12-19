@@ -15,7 +15,7 @@ extern void ui_SC03Dispensar_screen_init(void);
 extern void ui_SC03Dispensar_screen_destroy(void);
 extern lv_obj_t *ui_SC03Dispensar;
 extern lv_obj_t *ui_SC03Title;
-extern lv_obj_t *ui_Spinbox1;
+//extern lv_obj_t *ui_Spinbox1;
 extern lv_obj_t *ui_BarDispensed;
 extern lv_obj_t *ui_ImageBeverage;
 extern lv_obj_t *ui_BtnFinalizr1;

@@ -246,7 +246,7 @@ void _ui_checked_set_text_value( lv_obj_t *trg, lv_obj_t *src, const char *txt_o
     if (lv_obj_has_state(src,LV_STATE_CHECKED)) lv_label_set_text(trg,txt_on);
     else lv_label_set_text(trg,txt_off);
 }
-
+/*
 void _ui_spinbox_step(lv_obj_t * target, int val)
 {
 	if(val > 0) lv_spinbox_increment(target);
@@ -254,7 +254,7 @@ void _ui_spinbox_step(lv_obj_t * target, int val)
 
 	lv_obj_send_event(target,LV_EVENT_VALUE_CHANGED, 0);
 }
-
+*/
 void _ui_switch_theme(int val)
 {
 #ifdef UI_THEME_ACTIVE
