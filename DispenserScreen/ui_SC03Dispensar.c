@@ -5,7 +5,9 @@
 
 #include "ui.h"
 
-lv_obj_t *ui_SC03Dispensar = NULL;lv_obj_t *ui_SC03Title = NULL;lv_obj_t *ui_Spinbox1 = NULL;lv_obj_t *ui_BarDispensed = NULL;lv_obj_t *ui_ImageBeverage = NULL;lv_obj_t *ui_BtnFinalizr1 = NULL;lv_obj_t *ui_Label1 = NULL;lv_obj_t *ui_Image5 = NULL;
+lv_obj_t *ui_SC03Dispensar = NULL;lv_obj_t *ui_SC03Title = NULL;
+//lv_obj_t *ui_Spinbox1 = NULL;
+lv_obj_t *ui_BarDispensed = NULL;lv_obj_t *ui_ImageBeverage = NULL;lv_obj_t *ui_BtnFinalizr1 = NULL;lv_obj_t *ui_Label1 = NULL;lv_obj_t *ui_Image5 = NULL;
 // event funtions
 
 // build funtions
@@ -30,6 +32,7 @@ ui_object_set_themeable_style_property(ui_SC03Title, LV_PART_MAIN| LV_STATE_DEFA
 ui_object_set_themeable_style_property(ui_SC03Title, LV_PART_MAIN| LV_STATE_DEFAULT, LV_STYLE_TEXT_OPA, _ui_theme_alpha_ColorTxt);
 lv_obj_set_style_text_font(ui_SC03Title, &lv_font_montserrat_20, LV_PART_MAIN| LV_STATE_DEFAULT);
 
+/*
 ui_Spinbox1 = lv_spinbox_create(ui_SC03Dispensar);
 lv_obj_set_width( ui_Spinbox1, 100);
 lv_obj_set_height( ui_Spinbox1, 50);
@@ -43,6 +46,7 @@ lv_spinbox_set_digit_format( ui_Spinbox1, 4, 0);
 lv_spinbox_set_range( ui_Spinbox1, 0,1000 );
 lv_spinbox_set_cursor_pos(ui_Spinbox1, 1 - 1);
 lv_obj_set_style_text_font(ui_Spinbox1, &lv_font_montserrat_20, LV_PART_MAIN| LV_STATE_DEFAULT);
+*/
 
 ui_BarDispensed = lv_bar_create(ui_SC03Dispensar);
 lv_bar_set_range(ui_BarDispensed, 0,1000);
@@ -122,7 +126,7 @@ void ui_SC03Dispensar_screen_destroy(void)
 // NULL screen variables
 ui_SC03Dispensar= NULL;
 ui_SC03Title= NULL;
-ui_Spinbox1= NULL;
+//ui_Spinbox1= NULL;
 ui_BarDispensed= NULL;
 ui_ImageBeverage= NULL;
 ui_BtnFinalizr1= NULL;

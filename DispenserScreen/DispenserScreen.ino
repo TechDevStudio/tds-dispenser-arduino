@@ -787,8 +787,8 @@ void processValveControllerResponse() {
 }
 
 void onDispensePartial(float volumeMl) {
-  lv_spinbox_set_value(ui_Spinbox1, volumeMl); 
-  int percentage = map(volumeMl, 0, 3000, 0, 100);
+  //lv_spinbox_set_value(ui_Spinbox1, volumeMl); 
+  int percentage = map(volumeMl, 0, 1000, 0, 100);
   lv_bar_set_value(ui_BarDispensed, percentage, LV_ANIM_ON);
 }
 
