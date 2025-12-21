@@ -55,9 +55,11 @@ unsigned long lastUpdateTime = 0;
 unsigned long lastPulseSnapshot = 0;
 unsigned long currentMillis = 0;
 unsigned long currentMillisDemo = 0;
+unsigned long maxMlToDispense = 1000;
 
-bool firstRun=true;
-bool demoCycle=false;
+bool firstRun = true;
+bool demoCycle = false;
+bool forceEndClicked = false;
 
 void IRAM_ATTR flowSensorISR() {
   totalPulses++;
@@ -109,7 +111,7 @@ void FnStartDispensing(int valve_id){
   delay(100);
 
   //confirmacion de apertura
-  Serial.println("CM_DISP_ON");
+  FnPrintSerial("RSP_DISP_ON",true);
   
 }
 
@@ -138,8 +140,10 @@ void FnReadFlowSensor(){
     lastUpdateTime = currentTime;
 
     // Check for flow timeout
-    if (currentTime - lastPulseTime > TIMEOUT_NO_FLOW) {
+    if ((currentTime - lastPulseTime > TIMEOUT_NO_FLOW) || forceEndClicked || totalVolume > maxMlToDispense) {
+      forceEndClicked = false;
       current_state = DISPENSE_END;
+      FnCloseAllValves();
       FnPrintSerial("RSP_TOTAL_VOLUME:" + String(totalVolume,0),true);
     }
   }
@@ -202,7 +206,7 @@ void FnEndCleanCycle(){
   //FnPrintSerial("CLEAN_FINISHED",true);
   if(millis() > currentMillis + SAFE_DELAY_INTER_PROCESS){
     //interrupts();
-    FnPrintSerial("CM_READY",true);
+    FnPrintSerial("RSP_READY",true);
     current_state = WAITING_COMMAND;
     currentMillis = millis();
     firstRun = false;
@@ -267,8 +271,7 @@ void FnReadSerial(){
       // Dispensar 8
       FnStartDispensing(8);
     } else if (command == "CM_FORCEEND") {
-      // Dispensar 8
-      current_state = DISPENSE_END;
+      forceEndClicked = false;
     }else {
       Serial.print("Unknown command: ");
       Serial.println(command);

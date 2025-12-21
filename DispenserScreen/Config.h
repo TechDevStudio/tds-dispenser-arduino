@@ -14,6 +14,7 @@
 
 #define DEBUG false
 #define TIMEOUT_NO_SELECTION 10000 //segundos de inactividad para terminar proceso
+#define TIMEOUT_NO_WRISTBAND_RESPONSE 2000 //safe scan of wristband
 
 // WiFi credentials
 const char* WIFI_SSID = "DD-DSPNSR-NTWRK";

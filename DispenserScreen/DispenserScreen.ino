@@ -283,7 +283,6 @@ void onBeveragesReceived(const char* jsonData) {
 
     // Move to wristband scanning screen after beverages are loaded
     Serial.println("[DEBUG] Setting screen_status to 1 (RFID scan)");
-    screen_status = 1;
   } else {
     Serial.println("Failed to parse beverages or success=false");
     lv_label_set_text(ui_LblErrorMessage, "Error loading beverages");
@@ -330,12 +329,12 @@ void onWristbandVerified(bool valid, const char* jsonData) {
 void finalizarForzado(){
  Serial.println("CM_FORCEEND");
   //lv_scr_load_anim(ui_SC03Dispensar, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, false);
-  screen_status = 4;
+  //screen_status = 4;
 }
 
-void ForzarLimpieza(){
- Serial.println("CM_FORCEEND");
-}
+// void ForzarLimpieza(){
+//  Serial.println("CM_FORCEEND");
+// }
 
 void setup() {
   Serial.begin(115200);
@@ -435,7 +434,12 @@ void setup() {
     mqttManager.connect();
 
     // Start registration immediately
-    mqttManager.registerHardware();
+    //mqttManager.registerHardware();
+
+    screen_status = 0;
+  }
+  else{
+    lv_label_set_text(ui_LabelId, "Failed to connect to WIFI...");
   }
 
 
@@ -443,7 +447,7 @@ void setup() {
   //lv_obj_add_event_cb(ui_BtnNextComp, btn_sc03finalizar_clicked, LV_EVENT_CLICKED, NULL);
   lv_obj_add_event_cb(ui_BtnFinalizr1, btn_sc03finalizar_clicked, LV_EVENT_CLICKED, NULL);
   
-  screen_status = 0;
+  
   
 }
 
@@ -461,6 +465,8 @@ void loop() {
   // Handle MQTT communication
   if (WiFi.status() == WL_CONNECTED) {
     mqttManager.loop();
+  }else{
+    return;
   }
  
 
@@ -482,34 +488,36 @@ void loop() {
 
   switch (screen_status){
     case 0:
-            // Wait for dispenser ID and beverages - Show registration screen
+      // Wait for dispenser ID and beverages - Show registration screen
       if (screen_status != previousScreenStatus) {
         // Make sure we're on the registration screen
         lv_scr_load_anim(ui_SC00Registrar, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, false);
 
         char statusMsg[100];
         if (!mqttManager.hasDispenserId()) {
-          if(millis() - lastAttemptToGetData > 5000){
+          if(millis() - lastAttemptToGetData > 2000){
             lastAttemptToGetData = millis();
             mqttManager.registerHardware();
             sprintf(statusMsg, "Registering... HW: %s", hardwareId.c_str());
           }
+        } else if (!serialCommReady) {
+          Serial.println("[DEBUG] Revisando comunicacion serial");
+          if(millis() - lastAttemptToGetData > 5000){
+            lastAttemptToGetData = millis();
+            sprintf(statusMsg, "Communicating with Valves");
+            Serial.flush();
+            finalizarForzado();
+          }
+          processValveControllerResponse();
         } else if (!beveragesLoaded) {
           
-          if(millis() - lastAttemptToGetData > 5000){
+          if(millis() - lastAttemptToGetData > 3000){
             lastAttemptToGetData = millis();
             sprintf(statusMsg, "Loading beverages... ID: %d", dispenserId);
             mqttManager.requestBeverages();
           }
-        } else if (!serialCommReady) {
-          
-          if(millis() - lastAttemptToGetData > 10000){
-            lastAttemptToGetData = millis();
-            sprintf(statusMsg, "Communicating with Valves");
-            ForzarLimpieza();
-          }
-          processValveControllerResponse();
         } else {
+          Serial.println("[DEBUG] Todo listo para dispensar");
           sprintf(statusMsg, "Ready - Dispenser: %d", dispenserId);
           screen_status = 1;
         }
@@ -645,6 +653,23 @@ void loop() {
       }*/
       break;
 
+      case 5:
+        //waiting wristband validation response        
+        if (screen_status != previousScreenStatus) {
+          Serial.println("[DEBUG] Validating Wristband");
+
+          stateTimer = millis();
+          previousScreenStatus = screen_status;
+        }
+
+        if (millis() - stateTimer > TIMEOUT_NO_WRISTBAND_RESPONSE) {
+          // Clear the session
+          mqttManager.clearWristbandSession();
+          screen_status = 1;
+        }
+
+      break;
+
     default:
       break;
   }
@@ -729,6 +754,7 @@ unsigned long currentTime = millis();
   if (mqttManager.isConnected() && mqttManager.hasDispenserId()) {
     Serial.println("[DEBUG] MQTT connected and dispenser ID available, verifying wristband...");
     mqttManager.verifyWristband(tagID);
+    screen_status = 5; //verificando pulsera
   } else {
     Serial.print("[DEBUG] Cannot verify - MQTT connected: ");
     Serial.print(mqttManager.isConnected());
@@ -759,16 +785,12 @@ void selectBeverage(int beverageIndex) {
     String command = "CM_VALVE0" + String(bev->dispenser_valve);
     sendCommandToValveController(command);
 
-    // Move to dispensing screen
-    screen_status = 3;
   }
 }
 
 // Serial Communication Functions
 void sendCommandToValveController(String command) {
-  //Serial.print("[VALVE_CMD] Sending: ");
   Serial.println(command);
-  //valveSerial.println(command);
 }
 
 void processValveControllerResponse() {
@@ -792,15 +814,14 @@ void processValveControllerResponse() {
           float volume = volumeStr.toFloat();
           onDispensePartial(volume);
         }
-        else if (valveCommand == "CM_READY") {
-          //onValveControllerReady();
+        else if (valveCommand == "RSP_READY") {
+          onValveControllerReady();
 
-          screen_status = 0;
-          beveragesLoaded = false;
-          serialCommReady = true;
-        }
-        else if (valveCommand == "CLEAN_STARTED") {
-          Serial.println("[DEBUG] Cleaning complete");
+        }else if (valveCommand == "RSP_DISP_ON"){
+          // Move to dispensing screen
+          screen_status = 3;
+        }else if (valveCommand == "RSP_DISPENSE_END") {
+          Serial.println("[DEBUG] Cleaning STARTED");
           // Move to finalization screen
           screen_status = 4;
         }
@@ -820,10 +841,6 @@ void onDispensePartial(float volumeMl) {
 }
 
 void onDispenseComplete(float volumeMl) {
-  //Serial.print("[DEBUG] Dispense complete. Volume: ");
-  //Serial.print(volumeMl);
-  //Serial.println(" ml");
-
   totalVolumeDispensed = volumeMl;
 
   // Register consumption with MQTT
@@ -834,8 +851,9 @@ void onDispenseComplete(float volumeMl) {
 
 void onValveControllerReady() {
   Serial.println("[DEBUG] Valve controller is ready");
-  //screen_status = 1;
-  // Can be used to ensure valve controller is ready before operations
+  serialCommReady = true;
+  beveragesLoaded = false;
+  screen_status = 0;
 }
 
 // ============ BEVERAGE SELECTION CALLBACK ============
